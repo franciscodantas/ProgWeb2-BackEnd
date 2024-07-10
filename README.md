@@ -1,10 +1,9 @@
-# ProgWeb2 - Banco de Questões para as disciplinas CCC
+# ProgWeb2 - Banco de Questões para as Disciplinas CCC
 
-## Sobre o projeto
+## Sobre o Projeto
 
-O projeto tem como intenção criar um banco de questões para que os alunos, bem como os professores, possam fornecer mais questões para que os alunos possam praticar para aquela disciplina.
+O objetivo deste projeto é criar um banco de questões para que tanto alunos quanto professores possam fornecer mais questões, permitindo que os alunos pratiquem para as disciplinas.
 
-## O que será usado e como funcionará?
+## O que Será Usado e Como Funcionará
 
-Minha intenção é que os alunos possam enviar questões para essa aplicação e que cada professor, caso queira, mante-las, modifica-las ou exclui-las de suas disciplinas.
-Usarei uma API - EURECA.
+A aplicação permitirá que os alunos enviem questões, e cada professor poderá, se desejar, manter, modificar ou excluir questões de suas disciplinas. Utilizaremos a API EURECA para obter as disciplinas do curso de computação e para o login dos usuários.
