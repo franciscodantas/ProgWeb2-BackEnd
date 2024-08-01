@@ -13,8 +13,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Question {
-  id String @id @default(uuid())
+model User {
+  id                 Int         @id @default(autoincrement())
+  name               String
+  identityProviderId String
+  code               String
+  type               String
+  email              String
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  questions          Question[]
+}
 
-  @@map("questions")
+model Discipline {
+  id              Int        @id @default(autoincrement())
+  courseCode      String
+  curriculumCode  String
+  subjectCode     String
+  name            String
+  type            String
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  questions       Question[]
+}
+
+model Question {
+  id            Int         @id @default(autoincrement())
+  title         String
+  content       String
+  answer        String
+  image         Bytes
+  authorId      Int
+  disciplineId  Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  author        User        @relation(fields: [authorId], references: [id])
+  discipline    Discipline  @relation(fields: [disciplineId], references: [id])
 }
