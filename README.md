@@ -7,3 +7,6 @@ O objetivo deste projeto é criar um banco de questões para que tanto alunos qu
 ## O que Será Usado e Como Funcionará
 
 A aplicação permitirá que os alunos enviem questões, e cada professor poderá, se desejar, manter, modificar ou excluir questões de suas disciplinas. Utilizaremos a API EURECA para obter as disciplinas do curso de computação e para o login dos usuários.
+
+## Documentação Swagger
+Acesse a documentação da API por esse [link](https://app.swaggerhub.com/apis/FRANCISCOANTONIOSOUS/QuestCCC/1.0.0)
