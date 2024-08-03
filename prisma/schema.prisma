@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id                 Int         @id @default(autoincrement())
+  id                 Int         @id
   name               String
   identityProviderId String
   code               String
@@ -42,7 +42,7 @@ model Question {
   title         String
   content       String
   answer        String
-  image         Bytes
+  image         Bytes?
   authorId      Int
   disciplineId  Int
   createdAt     DateTime    @default(now())
