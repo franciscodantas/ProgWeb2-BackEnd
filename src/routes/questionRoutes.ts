@@ -19,7 +19,7 @@ questionRoutes.post('/questions', createQuestionController.handle);
 questionRoutes.get('/questions', getQuestionsController.handle);
 questionRoutes.get('/questions/:id', getQuestionByIdController.handle);
 questionRoutes.put('/questions/:id', updateQuestionController.handle);
-questionRoutes.patch('/questions/:id', patchQuestionController.handle); // Adiciona rota PATCH
+questionRoutes.patch('/questions/:id', patchQuestionController.handle);
 questionRoutes.delete('/questions/:id', deleteQuestionController.handle);
 
 export { questionRoutes };
