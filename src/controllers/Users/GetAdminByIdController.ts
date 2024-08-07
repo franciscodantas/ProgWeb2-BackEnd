@@ -9,7 +9,7 @@ export class GetAdminByIdController {
 
         try {
             const admin = await prismaClient.user.findUnique({
-                where: { id: Number(id) },
+                where: { id: Number(id), type: 'Adm' },
                 include: {
                     questions: true
                 }

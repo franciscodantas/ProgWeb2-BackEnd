@@ -9,7 +9,7 @@ export class GetProfessorByIdController {
 
         try {
             const professor = await prismaClient.user.findUnique({
-                where: { id: Number(id) },
+                where: { id: Number(id), type: 'Professor' },
                 include: {
                     questions: true
                 }

@@ -24,10 +24,10 @@ export class CreateQuestionController {
             },
           });
       
-          return question;
+          return response.status(200).json(question);
         } catch (error) {
           console.error('Error creating question:', error);
-          throw error;
+          return response.status(500).json({ error: "An error occurred while fetching the discipline." });
         }
     }
 }
