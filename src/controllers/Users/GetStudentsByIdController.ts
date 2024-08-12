@@ -16,12 +16,12 @@ export class GetStudentsByIdController {
             })
 
             if (!student) {
-                return response.status(404).json({ error: "Question not found." })
+                return response.status(404).json({ error: "Student not found." })
             }
 
             return response.status(200).json(student)
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while fetching the question." })
+            return response.status(500).json({ error: "An error occurred while fetching the student." })
         }
     }
 }

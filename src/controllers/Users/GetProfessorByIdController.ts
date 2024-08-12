@@ -16,12 +16,12 @@ export class GetProfessorByIdController {
             })
 
             if (!professor) {
-                return response.status(404).json({ error: "Question not found." })
+                return response.status(404).json({ error: "Professor not found." })
             }
 
             return response.status(200).json(professor)
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while fetching the question." })
+            return response.status(500).json({ error: "An error occurred while fetching the profesor." })
         }
     }
 }

@@ -8,20 +8,17 @@ export class GetAdminByIdController {
         const { id } = request.params
 
         try {
-            const admin = await prismaClient.user.findUnique({
-                where: { id: Number(id), type: 'Adm' },
-                include: {
-                    questions: true
-                }
+            const admin = await prismaClient.adm.findUnique({
+                where: { id: Number(id) }
             })
 
             if (!admin) {
-                return response.status(404).json({ error: "Question not found." })
+                return response.status(404).json({ error: "Adm not found." })
             }
 
             return response.status(200).json(admin)
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while fetching the question." })
+            return response.status(500).json({ error: "An error occurred while fetching the adm." })
         }
     }
 }

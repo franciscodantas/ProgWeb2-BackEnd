@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { questionRoutes } from './routes/questionRoutes'
 import { disciplineRoutes } from './routes/disciplineRoutes';
 import { userRoutes } from './routes/userRoutes';
+import { admRoutes } from './routes/admRoutes';
 
 const app = express();
 const port = 3000;
@@ -9,6 +10,7 @@ app.use(express.json());
 app.use(questionRoutes);
 app.use(disciplineRoutes);
 app.use(userRoutes);
+app.use(admRoutes);
 
 
 app.get('/', (req: Request, res: Response) => {
