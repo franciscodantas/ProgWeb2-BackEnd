@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { GetAllDisciplinesController } from '../controllers/Disciplines/GetAllDisciplinesController';
-import { GetDisciplineByIdController } from '../controllers/Disciplines/GetDisciplineByIdController';
-import { CreateDisciplineController} from '../controllers/Disciplines/CreateDisciplineController';
-import { PatchDisciplineController } from '../controllers/Disciplines/PatchDisciplineController';
-import { UpdateDisciplineController } from '../controllers/Disciplines/UpdateDisciplineController';
-import { DeleteDisciplineController } from '../controllers/Disciplines/DeleteDisciplineController';
+import { GetAllDisciplinesController } from '../controllers/disciplines/GetAllDisciplinesController';
+import { GetDisciplineByIdController } from '../controllers/disciplines/GetDisciplineByIdController';
+import { CreateDisciplineController} from '../controllers/disciplines/CreateDisciplineController';
+import { PatchDisciplineController } from '../controllers/disciplines/PatchDisciplineController';
+import { UpdateDisciplineController } from '../controllers/disciplines/UpdateDisciplineController';
+import { DeleteDisciplineController } from '../controllers/disciplines/DeleteDisciplineController';
 
 const disciplineRoutes = Router();
 

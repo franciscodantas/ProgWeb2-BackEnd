@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { GetAdminsController } from '../controllers/Adm/GetAdminsController';
-import { GetAdminByIdController } from '../controllers/Adm/GetAdminByIdController';
-import { CreateAdmController } from '../controllers/Adm/CreateAdmController';
-import { UpdateAdmController } from '../controllers/Adm/UpdateAdmController';
-import { PatchAdmController } from '../controllers/Adm/PatchAdmController';
-import { DeleteAdmController } from '../controllers/Adm/DeleteAdmController';
+import { GetAdminsController } from '../controllers/adms/GetAdminsController';
+import { GetAdminByIdController } from '../controllers/adms/GetAdminByIdController';
+import { CreateAdmController } from '../controllers/adms/CreateAdmController';
+import { UpdateAdmController } from '../controllers/adms/UpdateAdmController';
+import { PatchAdmController } from '../controllers/adms/PatchAdmController';
+import { DeleteAdmController } from '../controllers/adms/DeleteAdmController';
 
 const admRoutes = Router();
 

@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { CreateQuestionController } from '../controllers/Questions/CreateQuestionController';
-import { GetQuestionsController } from '../controllers/Questions/GetQuestionsController';
-import { GetQuestionByIdController } from '../controllers/Questions/GetQuestionByIdController';
-import { UpdateQuestionController } from '../controllers/Questions/UpdateQuestionController';
-import { DeleteQuestionController } from '../controllers/Questions/DeleteQuestionController';
-import { PatchQuestionController } from '../controllers/Questions/PatchQuestionController';
+import { CreateQuestionController } from '../controllers/questions/CreateQuestionController';
+import { GetQuestionsController } from '../controllers/questions/GetQuestionsController';
+import { GetQuestionByIdController } from '../controllers/questions/GetQuestionByIdController';
+import { UpdateQuestionController } from '../controllers/questions/UpdateQuestionController';
+import { DeleteQuestionController } from '../controllers/questions/DeleteQuestionController';
+import { PatchQuestionController } from '../controllers/questions/PatchQuestionController';
 
 const questionRoutes = Router();
 

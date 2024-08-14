@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { GetProfessorsController } from '../controllers/Users/GetProfessorsController';
-import { GetStudentsController } from '../controllers/Users/GetStudentsController';
-import { GetStudentsByIdController } from '../controllers/Users/GetStudentsByIdController';
-import { GetProfessorByIdController } from '../controllers/Users/GetProfessorByIdController';
-import { CreateUserController } from '../controllers/Users/CreateUserController';
-import { UpdateUserController } from '../controllers/Users/UpdateUserController';
-import { PatchUserController } from '../controllers/Users/PatchUserController';
-import { DeleteUserController } from '../controllers/Users/DeleteUserController';
+import { GetProfessorsController } from '../controllers/users/GetProfessorsController';
+import { GetStudentsController } from '../controllers/users/GetStudentsController';
+import { GetStudentsByIdController } from '../controllers/users/GetStudentsByIdController';
+import { GetProfessorByIdController } from '../controllers/users/GetProfessorByIdController';
+import { CreateUserController } from '../controllers/users/CreateUserController';
+import { UpdateUserController } from '../controllers/users/UpdateUserController';
+import { PatchUserController } from '../controllers/users/PatchUserController';
+import { DeleteUserController } from '../controllers/users/DeleteUserController';
 
 const userRoutes = Router();
 
