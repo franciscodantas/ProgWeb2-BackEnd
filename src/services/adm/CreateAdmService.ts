@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prismaClient = new PrismaClient();
 
 export class CreateAdmService {
-    async createAdm(name: string, email: string): Promise<any> {
+    async createAdm(name: any, email: any) {
         try {
             const newAdm = await prismaClient.adm.create({
                 data: {
