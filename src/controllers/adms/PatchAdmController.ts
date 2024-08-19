@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prismaClient = new PrismaClient();
+import { PatchAdmService } from '../../services/adm/PatchAdmService';
 
 export class PatchAdmController {
     async handle(request: Request, response: Response) {
@@ -9,13 +7,18 @@ export class PatchAdmController {
         const updates = request.body;
 
         try {
-            const updatedAdm = await prismaClient.adm.update({
-                where: { id: parseInt(id) },
-                data: updates,
-            });
+            const admService = new PatchAdmService();
+            const updatedAdm = await admService.patchAdm(parseInt(id), updates);
+
+            if (updatedAdm instanceof Error) {
+                return response.status(404).json({ error: updatedAdm.message });
+            }
+
             return response.status(200).json(updatedAdm);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while partially updating the adm." });
+            if (error instanceof Error) {
+                return response.status(500).json({ error: "An unexpected error occurred.", info: error.message, stackTrace: error.stack });
+            }
         }
     }
 }
