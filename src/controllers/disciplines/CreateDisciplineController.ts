@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CreateDisciplineService } from '../../services/disciplinnes/CreateDisciplineService';
+import { CreateDisciplineService } from '../../services/discipline/CreateDisciplineService';
 
 export class CreateDisciplineController {
     async handle(request: Request, response: Response) {

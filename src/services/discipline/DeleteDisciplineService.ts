@@ -2,17 +2,17 @@ import { PrismaClient } from '@prisma/client';
 
 const prismaClient = new PrismaClient();
 
-export class DeleteAdmService {
-    async delete(id: any) {
+export class DeleteDisciplineService {
+    async deleteDiscipline(id: number) {
         try {
-            const deletedAdm = await prismaClient.adm.delete({
-                where: { id: parseInt(id) },
+            const deletedDiscipline = await prismaClient.discipline.delete({
+                where: { id }
             });
-            return deletedAdm;
+            return deletedDiscipline;
         } catch (error) {
             console.error('Error deleting discipline:', error);
             if (error instanceof Error && error.message.includes('Record to delete does not exist.')) {
-                return new Error("Admin not found.");
+                return new Error("Discipline not found.");
             }
             return error;
         }

@@ -1,20 +1,23 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prismaClient = new PrismaClient();
+import { DeleteDisciplineService } from '../../services/discipline/DeleteDisciplineService';
 
 export class DeleteDisciplineController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
 
         try {
-            const deletedDiscipline = await prismaClient.discipline.delete({
-                where: { id: parseInt(id) },
-            });
+            const disciplineService = new DeleteDisciplineService();
+            const result = await disciplineService.deleteDiscipline(Number(id));
 
-            return response.status(204).json(deletedDiscipline);
+            if (result instanceof Error) {
+                return response.status(404).json({ error: result.message });
+            }
+
+            return response.status(204).json(result);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while deleting the discipline." });
+            if (error instanceof Error) {
+                return response.status(500).json({ error: "An unexpected error occurred.", info: error.message, stackTrace: error.stack });
+            }
         }
     }
 }

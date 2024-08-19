@@ -9,15 +9,15 @@ export class DeleteAdmController {
             const deleteService = new DeleteAdmService();
             const deletedAdm = await deleteService.delete(id);
 
-            if (deletedAdm == null) {
-                return response.status(404).json({ error: "Adm not found!" });
-            } else if (deletedAdm instanceof Error) {
-                return response.status(400).json({ error: "An error occurred while deleting the adm.", info: deletedAdm.message });
+            if (deletedAdm instanceof Error) {
+                return response.status(404).json({ error: deletedAdm.message });
             }
 
             return response.status(204).send();
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while deleting the adm.", details: error});
+            if (error instanceof Error) {
+                return response.status(500).json({ error: "An unexpected error occurred.", info: error.message, stackTrace: error.stack });
+            }
         }
     }
 }
