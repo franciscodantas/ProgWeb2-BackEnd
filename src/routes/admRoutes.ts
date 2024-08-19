@@ -16,10 +16,10 @@ const patchAdmController = new PatchAdmController();
 const deleteAdmController = new DeleteAdmController();
 
 admRoutes.get('/admins', getAdminsController.handle);
-admRoutes.get('/admin/:id', getAdminByIdController.handle)
-admRoutes.post('/admin', createAdmController.handle);
-admRoutes.put('/admin/:id', updateAdmController.handle);
-admRoutes.patch('/admin/:id', patchAdmController.handle);
+admRoutes.get('/admins/:id', getAdminByIdController.handle)
+admRoutes.post('/admins', createAdmController.handle);
+admRoutes.put('/admins/:id', updateAdmController.handle);
+admRoutes.patch('/admins/:id', patchAdmController.handle);
 admRoutes.delete('/admins/:id', deleteAdmController.handle);
 
 export { admRoutes };

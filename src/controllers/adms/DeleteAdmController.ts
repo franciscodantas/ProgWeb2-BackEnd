@@ -1,20 +1,23 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prismaClient = new PrismaClient();
+import { DeleteAdmService } from '../../services/adm/DeleteAdmService';
 
 export class DeleteAdmController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
 
         try {
-            const deletedAdm = await prismaClient.adm.delete({
-                where: { id: parseInt(id) },
-            });
+            const deleteService = new DeleteAdmService();
+            const deletedAdm = await deleteService.delete(id);
 
-            return response.status(204).json(deletedAdm);
+            if (deletedAdm == null) {
+                return response.status(404).json({ error: "Adm not found!" });
+            } else if (deletedAdm instanceof Error) {
+                return response.status(400).json({ error: "An error occurred while deleting the adm.", info: deletedAdm.message });
+            }
+
+            return response.status(204).send();
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while deleting the adm." });
+            return response.status(500).json({ error: "An error occurred while deleting the adm.", details: error});
         }
     }
 }
