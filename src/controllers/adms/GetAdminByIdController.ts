@@ -1,24 +1,24 @@
-import { Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
-
-const prismaClient = new PrismaClient()
+import { Request, Response } from 'express';
+import { GetAdminByIdService } from '../../services/adm/GetAdminByIdService';
 
 export class GetAdminByIdController {
-    async handle(request: Request, response: Response){
-        const { id } = request.params
+    async handle(request: Request, response: Response) {
+        const { id } = request.params;
 
         try {
-            const admin = await prismaClient.adm.findUnique({
-                where: { id: Number(id) }
-            })
+            const adminService = new GetAdminByIdService();
+            const admin = await adminService.getAdminById(Number(id));
 
-            if (!admin) {
-                return response.status(404).json({ error: "Adm not found." })
+            if (admin instanceof Error) {
+                return response.status(404).json({ error: admin.message });
             }
 
-            return response.status(200).json(admin)
+            return response.status(200).json(admin);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while fetching the adm." })
+            if (error instanceof Error) {
+                return response.status(500).json({ error: "An unexpected error occurred.", info: error.message, stackTrace: error.stack });
+            }
+            return response.status(500).json({ error: "An unexpected error occurred.", info: error });
         }
     }
 }
