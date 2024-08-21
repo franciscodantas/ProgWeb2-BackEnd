@@ -1,17 +1,21 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient} from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 const prismaClient = new PrismaClient();
 
 export class DeleteAdmService {
-    async delete(id: any) {
+    async delete(id: number) {
         try {
             const deletedAdm = await prismaClient.adm.delete({
-                where: { id: parseInt(id) },
+                where: { id }
             });
-            return deletedAdm|| new Error("Adm not found.");
+            return deletedAdm;
         } catch (error) {
-            console.error('Error deleting discipline:', error);
-            return error;
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+                throw new Error("Adm not found.");
+            }
+            console.error('Error deleting ADM:', error);
+            throw error; 
         }
     }
 }

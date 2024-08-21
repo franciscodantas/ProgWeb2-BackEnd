@@ -7,20 +7,21 @@ export class DeleteDisciplineController {
 
         try {
             const disciplineService = new DeleteDisciplineService();
-            const result = await disciplineService.deleteDiscipline(Number(id));
+            await disciplineService.deleteDiscipline(Number(id));
 
-            if (result instanceof Error) {
-                return response.status(404).json({ error: result.message });
-            }
-
-            return response.status(204).json(result);
+            return response.status(204).send();
         } catch (error) {
             if (error instanceof Error) {
+                if (error.message === "Discipline not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
                 return response.status(500).json({
                     error: "An unexpected error occurred.",
                     info: error.message,
                     stackTrace: error.stack
                 });
+            } else {
+                return response.status(500).json({ error: "An unexpected error occurred." });
             }
         }
     }

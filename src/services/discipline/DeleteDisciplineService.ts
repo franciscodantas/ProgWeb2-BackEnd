@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 const prismaClient = new PrismaClient();
 
@@ -8,10 +9,14 @@ export class DeleteDisciplineService {
             const deletedDiscipline = await prismaClient.discipline.delete({
                 where: { id }
             });
-            return deletedDiscipline || new Error("Discipline not found.");
+            return deletedDiscipline;
         } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+                // Record not found
+                throw new Error("Discipline not found.");
+            }
             console.error('Error deleting discipline:', error);
-            return error;
+            throw error; // Re-throw other errors
         }
     }
 }

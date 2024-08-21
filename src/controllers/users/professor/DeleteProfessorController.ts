@@ -1,20 +1,26 @@
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prismaClient = new PrismaClient();
+import { Request, Response } from 'express'; 
+import { DeleteProfessorService } from '../../../services/user/professor/DeleteProfessorService';
 
 export class DeleteProfessorController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
 
         try {
-            const deletedUser = await prismaClient.professor.delete({
-                where: { id: parseInt(id) },
-            });
+            const deleteProfessorService = new DeleteProfessorService();
+            const result = await deleteProfessorService.deleteProfessor(parseInt(id));
 
-            return response.status(200).json(deletedUser);
+            return response.status(204).send();
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while deleting the user." });
+            if (error instanceof Error) {
+                if (error.message === "Professor not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack
+                });
+            }
         }
     }
 }
