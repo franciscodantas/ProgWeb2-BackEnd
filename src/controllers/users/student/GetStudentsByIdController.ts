@@ -8,10 +8,10 @@ export class GetStudentsByIdController {
         const { id } = request.params
 
         try {
-            const student = await prismaClient.user.findUnique({
-                where: { id: Number(id), type: 'Aluno' },
+            const student = await prismaClient.student.findUnique({
+                where: { id: Number(id) },
                 include: {
-                    questions: true
+                    Question: true
                 }
             })
 

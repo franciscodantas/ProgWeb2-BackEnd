@@ -6,10 +6,10 @@ const prismaClient = new PrismaClient();
 export class GetProfessorsController {
     async handle(request: Request, response: Response) {
         try {
-            const professors = await prismaClient.user.findMany({
-                where: { type: 'Professor' },
+            const professors = await prismaClient.professor.findMany({
                 include: {
-                    questions: true
+                    Question: true,
+                    disciplines: true,
                 }
             });
             return response.status(200).json(professors);

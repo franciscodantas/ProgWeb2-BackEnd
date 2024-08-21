@@ -8,7 +8,8 @@ export class GetQuestionsController {
         try {
             const questions = await prismaClient.question.findMany({
                 include: {
-                    author: true,
+                    student: true,
+                    professor: true,
                     discipline: true
                 }
             })

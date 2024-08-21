@@ -11,7 +11,8 @@ export class GetQuestionByIdController {
             const question = await prismaClient.question.findUnique({
                 where: { id: Number(id) },
                 include: {
-                    author: true,
+                    student: true,
+                    professor: true,
                     discipline: true
                 }
             })

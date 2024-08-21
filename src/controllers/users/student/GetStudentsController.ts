@@ -6,10 +6,9 @@ const prismaClient = new PrismaClient();
 export class GetStudentsController {
     async handle(request: Request, response: Response) {
         try {
-            const students = await prismaClient.user.findMany({
-                where: { type: 'Aluno' },
+            const students = await prismaClient.student.findMany({
                 include: {
-                    questions: true
+                    Question: true
                 }
             });
             return response.status(200).json(students);

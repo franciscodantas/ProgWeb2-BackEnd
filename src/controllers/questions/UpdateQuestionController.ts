@@ -6,7 +6,7 @@ const prismaClient = new PrismaClient()
 export class UpdateQuestionController {
     async handle(request: Request, response: Response){
         const { id } = request.params
-        const { title, content, answer, image, authorId, disciplineId } = request.body
+        const { title, content, answer, image, professorId, studentId, disciplineId }  = request.body
 
         try {
             const updatedQuestion = await prismaClient.question.update({
@@ -16,7 +16,8 @@ export class UpdateQuestionController {
                     content,
                     answer,
                     image,
-                    authorId,
+                    professorId,
+                    studentId,
                     disciplineId
                 }
             })
