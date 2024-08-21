@@ -13,16 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                 Int         @id
+model Professor {
+  id                 Int         @id @default(autoincrement())
   name               String
   identityProviderId String
   code               String
-  type               String
   email              String
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
-  questions          Question[]
+  disciplines        Discipline[] @relation("ProfessorDiscipline")
+
+  Question Question[]
+}
+
+model Student {
+  id                 Int         @id @default(autoincrement())
+  name               String
+  identityProviderId String
+  code               String
+  email              String
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  Question Question[]
 }
 
 model Adm {
@@ -43,7 +56,9 @@ model Discipline {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   questions       Question[]
+  professors      Professor[] @relation("ProfessorDiscipline")
 }
+
 
 model Question {
   id            Int         @id @default(autoincrement())
@@ -51,11 +66,13 @@ model Question {
   content       String
   answer        String
   image         Bytes?
-  authorId      Int
+  professorId   Int?
+  studentId     Int?
   disciplineId  Int
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  author        User        @relation(fields: [authorId], references: [id])
+  professor     Professor?  @relation(fields: [professorId], references: [id])
+  student       Student?    @relation(fields: [studentId], references: [id])
   discipline    Discipline  @relation(fields: [disciplineId], references: [id])
 }

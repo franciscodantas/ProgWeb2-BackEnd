@@ -3,19 +3,19 @@ import { PrismaClient } from '@prisma/client';
 
 const prismaClient = new PrismaClient();
 
-export class CreateUserController {
+export class CreateProfessorController {
     async handle(request: Request, response: Response) {
-        const { id, name, identityProviderId, code, type, email } = request.body;
+        const { id, name, identityProviderId, code, email, disciplines } = request.body;
 
         try {
-            const newUser = await prismaClient.user.create({
+            const newUser = await prismaClient.professor.create({
                 data: {
                     id,
                     name,
                     identityProviderId,
                     code,
-                    type,
                     email,
+                    disciplines
                 },
             });
 

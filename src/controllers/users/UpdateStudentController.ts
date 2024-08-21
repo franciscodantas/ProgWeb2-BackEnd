@@ -3,19 +3,18 @@ import { PrismaClient } from '@prisma/client';
 
 const prismaClient = new PrismaClient();
 
-export class UpdateUserController {
+export class UpdateStudentController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
-        const { name, identityProviderId, code, type, email } = request.body;
+        const { name, identityProviderId, code, email } = request.body;
 
         try {
-            const updatedUser = await prismaClient.user.update({
+            const updatedUser = await prismaClient.student.update({
                 where: { id: parseInt(id) },
                 data: {
                     name,
                     identityProviderId,
                     code,
-                    type,
                     email,
                 },
             });

@@ -15,12 +15,12 @@ const updateDisciplineController = new UpdateDisciplineController();
 const getDisciplineByIdController = new GetDisciplineByIdController();
 const deleteDisciplineController = new DeleteDisciplineController();
 
-disciplineRoutes.get('/disciplines', getAllDisciplinesController.handle);
-disciplineRoutes.get('/disciplines/:id', getDisciplineByIdController.handle);
-disciplineRoutes.post('/disciplines', createDisciplineController.handle);
-disciplineRoutes.patch('/disciplines/:id', patchDisciplineController.handle);
-disciplineRoutes.delete('/disciplines/:id', deleteDisciplineController.handle);
-disciplineRoutes.put('/disciplines/:id', updateDisciplineController.handle);
+disciplineRoutes.get('/api/disciplines', getAllDisciplinesController.handle);
+disciplineRoutes.get('/api/disciplines/:id', getDisciplineByIdController.handle);
+disciplineRoutes.post('/api/disciplines', createDisciplineController.handle);
+disciplineRoutes.patch('/api/disciplines/:id', patchDisciplineController.handle);
+disciplineRoutes.delete('/api/disciplines/:id', deleteDisciplineController.handle);
+disciplineRoutes.put('/api/disciplines/:id', updateDisciplineController.handle);
 
 
 export { disciplineRoutes };

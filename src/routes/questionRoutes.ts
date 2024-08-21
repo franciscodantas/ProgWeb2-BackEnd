@@ -15,11 +15,11 @@ const updateQuestionController = new UpdateQuestionController();
 const deleteQuestionController = new DeleteQuestionController();
 const patchQuestionController = new PatchQuestionController();
 
-questionRoutes.post('/questions', createQuestionController.handle);
-questionRoutes.get('/questions', getQuestionsController.handle);
-questionRoutes.get('/questions/:id', getQuestionByIdController.handle);
-questionRoutes.put('/questions/:id', updateQuestionController.handle);
-questionRoutes.patch('/questions/:id', patchQuestionController.handle);
-questionRoutes.delete('/questions/:id', deleteQuestionController.handle);
+questionRoutes.post('/api/questions', createQuestionController.handle);
+questionRoutes.get('/api/questions', getQuestionsController.handle);
+questionRoutes.get('/api/questions/:id', getQuestionByIdController.handle);
+questionRoutes.put('/api/questions/:id', updateQuestionController.handle);
+questionRoutes.patch('/api/questions/:id', patchQuestionController.handle);
+questionRoutes.delete('/api/questions/:id', deleteQuestionController.handle);
 
 export { questionRoutes };

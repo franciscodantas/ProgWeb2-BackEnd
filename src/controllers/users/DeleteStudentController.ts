@@ -3,12 +3,12 @@ import { PrismaClient } from '@prisma/client';
 
 const prismaClient = new PrismaClient();
 
-export class DeleteUserController {
+export class DeleteStudentController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
 
         try {
-            const deletedUser = await prismaClient.user.delete({
+            const deletedUser = await prismaClient.student.delete({
                 where: { id: parseInt(id) },
             });
 

@@ -3,20 +3,20 @@ import { PrismaClient } from '@prisma/client';
 
 const prismaClient = new PrismaClient();
 
-export class PatchUserController {
+export class PatchProfessorController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
-        const { name, identityProviderId, code, type, email } = request.body;
+        const { name, identityProviderId, code, email, disciplines } = request.body;
 
         try {
-            const updatedUser = await prismaClient.user.update({
+            const updatedUser = await prismaClient.professor.update({
                 where: { id: parseInt(id) },
                 data: {
                     name: name || undefined,
                     identityProviderId: identityProviderId || undefined,
                     code: code || undefined,
-                    type: type || undefined,
                     email: email || undefined,
+                    disciplines: disciplines || undefined,
                 },
             });
 
