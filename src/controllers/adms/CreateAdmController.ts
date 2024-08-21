@@ -18,9 +18,12 @@ export class CreateAdmController {
             return response.status(201).json(newAdm);
         } catch (error) {
             if (error instanceof Error){
-                return response.status(500).json({ error: "An unexpected error occurred.", info: error.message, stackTrace: error.stack});
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack
+                });
             }
-            return response.status(500).json({ error: "An unexpected error occurred.", info: error});
         }
     }
 }

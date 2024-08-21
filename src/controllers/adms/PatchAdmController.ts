@@ -17,7 +17,11 @@ export class PatchAdmController {
             return response.status(200).json(updatedAdm);
         } catch (error) {
             if (error instanceof Error) {
-                return response.status(500).json({ error: "An unexpected error occurred.", info: error.message, stackTrace: error.stack });
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack
+                });
             }
         }
     }

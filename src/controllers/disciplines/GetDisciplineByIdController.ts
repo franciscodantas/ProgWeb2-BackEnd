@@ -1,27 +1,27 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prismaClient = new PrismaClient();
+import { GetDisciplineByIdService } from '../../services/discipline/GetDisciplineByIdService';
 
 export class GetDisciplineByIdController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
 
         try {
-            const discipline = await prismaClient.discipline.findUnique({
-                where: { id: Number(id) },
-                include: {
-                    questions: true
-                }
-            });
+            const disciplineService = new GetDisciplineByIdService();
+            const result = await disciplineService.getDisciplineById(Number(id));
 
-            if (!discipline) {
-                return response.status(404).json({ error: "Discipline not found." });
+            if (result instanceof Error) {
+                return response.status(404).json({ error: result.message });
             }
 
-            return response.status(200).json(discipline);
+            return response.status(200).json(result);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while fetching the discipline." });
+            if (error instanceof Error) {
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack
+                });
+            }
         }
     }
 }
