@@ -38,9 +38,9 @@ userRoutes.delete('/api/users/students/:id', deleteStudentController.handle);
 
 userRoutes.get('/api/users/professors', getProfessorsController.handle);
 userRoutes.get('/api/user/professors/:id', getProfessorByIdController.handle);
+userRoutes.post('/api/users/professors/', createProfessorController.handle);
 userRoutes.put('/api/users/professors/:id', updateProfessorController.handle);
 userRoutes.patch('/api/users/professors/:id', patchProfessorController.handle);
 userRoutes.delete('/api/users/professors/:id', deleteProfessorController.handle);
-userRoutes.post('/api/users/professors/', createProfessorController.handle);
 
 export { userRoutes };
