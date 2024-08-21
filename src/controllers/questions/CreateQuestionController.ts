@@ -6,7 +6,7 @@ const prismaClient = new PrismaClient();
 export class CreateQuestionController {
 
     async handle(request: Request, response: Response) {
-        const { title, content, answer, image, authorId, disciplineId } = request.body;
+        const { title, content, answer, image, professorId, studentId, disciplineId } = request.body;
 
         try {
           const base64Image = image.trim();
@@ -19,7 +19,8 @@ export class CreateQuestionController {
               content,
               answer,
               image: imageBuffer,
-              authorId,
+              professorId,
+              studentId,
               disciplineId,
             },
           });
