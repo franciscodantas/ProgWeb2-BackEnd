@@ -1,16 +1,16 @@
 import { Router } from 'express';
-import { GetProfessorsController } from '../controllers/users/GetProfessorsController';
-import { GetStudentsController } from '../controllers/users/GetStudentsController';
-import { GetStudentsByIdController } from '../controllers/users/GetStudentsByIdController';
-import { GetProfessorByIdController } from '../controllers/users/GetProfessorByIdController';
-import { CreateStudentController } from '../controllers/users/CreateStudentController';
-import { UpdateStudentController } from '../controllers/users/UpdateStudentController';
-import { PatchStudentController } from '../controllers/users/PatchStudentController';
-import { DeleteStudentController } from '../controllers/users/DeleteStudentController';
-import { CreateProfessorController } from '../controllers/users/CreateProfessorController';
-import { DeleteProfessorController } from '../controllers/users/DeleteProfessorController';
-import { UpdateProfessorController } from '../controllers/users/UpdateProfessorController';
-import { PatchProfessorController } from '../controllers/users/PatchProfessorController';
+import { GetProfessorsController } from '../controllers/users/professor/GetProfessorsController';
+import { GetStudentsController } from '../controllers/users/student/GetStudentsController';
+import { GetStudentsByIdController } from '../controllers/users/student/GetStudentsByIdController';
+import { GetProfessorByIdController } from '../controllers/users/professor/GetProfessorByIdController';
+import { CreateStudentController } from '../controllers/users/student/CreateStudentController';
+import { UpdateStudentController } from '../controllers/users/student/UpdateStudentController';
+import { PatchStudentController } from '../controllers/users/student/PatchStudentController';
+import { DeleteStudentController } from '../controllers/users/student/DeleteStudentController';
+import { CreateProfessorController } from '../controllers/users/professor/CreateProfessorController';
+import { DeleteProfessorController } from '../controllers/users/professor/DeleteProfessorController';
+import { UpdateProfessorController } from '../controllers/users/professor/UpdateProfessorController';
+import { PatchProfessorController } from '../controllers/users/professor/PatchProfessorController';
 
 const userRoutes = Router();
 
