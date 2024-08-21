@@ -8,12 +8,9 @@ export class DeleteDisciplineService {
             const deletedDiscipline = await prismaClient.discipline.delete({
                 where: { id }
             });
-            return deletedDiscipline;
+            return deletedDiscipline || new Error("Discipline not found.");
         } catch (error) {
             console.error('Error deleting discipline:', error);
-            if (error instanceof Error && error.message.includes('Record to delete does not exist.')) {
-                return new Error("Discipline not found.");
-            }
             return error;
         }
     }

@@ -12,11 +12,7 @@ export class GetDisciplineByIdService {
                 }
             });
 
-            if (!discipline) {
-                return new Error("Discipline not found.");
-            }
-
-            return discipline;
+            return discipline || new Error("Discipline not found.");
         } catch (error) {
             console.error('Error fetching discipline:', error);
             return error;

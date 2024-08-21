@@ -8,12 +8,9 @@ export class DeleteAdmService {
             const deletedAdm = await prismaClient.adm.delete({
                 where: { id: parseInt(id) },
             });
-            return deletedAdm;
+            return deletedAdm|| new Error("Adm not found.");
         } catch (error) {
             console.error('Error deleting discipline:', error);
-            if (error instanceof Error && error.message.includes('Record to delete does not exist.')) {
-                return new Error("Admin not found.");
-            }
             return error;
         }
     }
