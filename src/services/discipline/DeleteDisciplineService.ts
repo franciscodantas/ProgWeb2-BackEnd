@@ -12,11 +12,10 @@ export class DeleteDisciplineService {
             return deletedDiscipline;
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
-                // Record not found
                 throw new Error("Discipline not found.");
             }
             console.error('Error deleting discipline:', error);
-            throw error; // Re-throw other errors
+            throw error;
         }
     }
 }

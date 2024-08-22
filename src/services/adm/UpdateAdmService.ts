@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 const prismaClient = new PrismaClient();
 
@@ -9,10 +10,13 @@ export class UpdateAdmService {
                 where: { id },
                 data: { name, email },
             });
-            return updatedAdm|| new Error("Adm not found.");
+            return updatedAdm;
         } catch (error) {
-            console.error('Error updating admin:', error);
-            return error;
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+                throw new Error("Adm not found.");
+            }
+            console.error('Error deleting ADM:', error);
+            throw error; 
         }
     }
 }

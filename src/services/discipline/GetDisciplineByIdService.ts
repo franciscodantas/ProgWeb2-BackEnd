@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 const prismaClient = new PrismaClient();
 
@@ -12,10 +13,13 @@ export class GetDisciplineByIdService {
                 }
             });
 
-            return discipline || new Error("Discipline not found.");
+            return discipline;
         } catch (error) {
-            console.error('Error fetching discipline:', error);
-            return error;
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+                throw new Error("Discipline not found.");
+            }
+            console.error('Error deleting discipline:', error);
+            throw error;
         }
     }
 }
