@@ -1,23 +1,22 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { UpdateProfessorService } from '../../../services/user/professor/UpdateProfessorService';
 
 const prismaClient = new PrismaClient();
 
 export class UpdateProfessorController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
-        const { name, identityProviderId, code, email, disciplines } = request.body;
+        const {name, identityProviderId, code, email, disciplines }= request.body;
 
         try {
-            const updatedUser = await prismaClient.professor.update({
-                where: { id: parseInt(id) },
-                data: {
-                    name,
-                    identityProviderId,
-                    code,
-                    email,
-                    disciplines,
-                },
+            const updatedProfessorService = new UpdateProfessorService();
+            const updatedUser = await updatedProfessorService.updateProfessor(parseInt(id), {
+                name,
+                identityProviderId,
+                code,
+                email,
+                disciplines,
             });
 
             return response.status(200).json(updatedUser);

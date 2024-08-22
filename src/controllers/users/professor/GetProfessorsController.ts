@@ -1,20 +1,21 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prismaClient = new PrismaClient();
+import { GetProfessorsService } from '../../../services/user/professor/GetProfessorsService';
 
 export class GetProfessorsController {
     async handle(request: Request, response: Response) {
         try {
-            const professors = await prismaClient.professor.findMany({
-                include: {
-                    Question: true,
-                    disciplines: true,
-                }
-            });
+            const getProfessorsService = new GetProfessorsService();
+            const professors = await getProfessorsService.getAllProfessors();
+
             return response.status(200).json(professors);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while fetching professors." });
+            if (error instanceof Error) {
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack,
+                });
+            }
         }
     }
 }

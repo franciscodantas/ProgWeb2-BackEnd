@@ -1,24 +1,17 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { PatchProfessorService } from '../../../services/user/professor/PatchProfessorService';
 
 const prismaClient = new PrismaClient();
 
 export class PatchProfessorController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
-        const { name, identityProviderId, code, email, disciplines } = request.body;
+        const updates = request.body;
 
         try {
-            const updatedUser = await prismaClient.professor.update({
-                where: { id: parseInt(id) },
-                data: {
-                    name: name || undefined,
-                    identityProviderId: identityProviderId || undefined,
-                    code: code || undefined,
-                    email: email || undefined,
-                    disciplines: disciplines || undefined,
-                },
-            });
+            const patchProfessorService = new PatchProfessorService();
+            const updatedUser = patchProfessorService.patchProfessor(parseInt(id), updates);
 
             return response.status(200).json(updatedUser);
         } catch (error) {
