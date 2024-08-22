@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { PrismaClient } from '@prisma/client'
+import { GetStudentByIdService } from '../../../services/user/student/GetStudentByIdService'
 
 const prismaClient = new PrismaClient()
 
@@ -8,20 +9,21 @@ export class GetStudentsByIdController {
         const { id } = request.params
 
         try {
-            const student = await prismaClient.student.findUnique({
-                where: { id: Number(id) },
-                include: {
-                    Question: true
-                }
-            })
+            const getStudentByIdService = new GetStudentByIdService();
+            const student = await getStudentByIdService.getStudentById(parseInt(id));
 
-            if (!student) {
-                return response.status(404).json({ error: "Student not found." })
-            }
-
-            return response.status(200).json(student)
+            return response.status(200).json(student);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while fetching the student." })
+            if (error instanceof Error) {
+                if (error.message === "Student not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack,
+                });
+            }
         }
     }
 }

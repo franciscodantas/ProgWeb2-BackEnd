@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { CreateStudentService } from '../../../services/user/student/CreateStudentService';
 
 const prismaClient = new PrismaClient();
 
@@ -8,19 +9,30 @@ export class CreateStudentController {
         const { id, name, identityProviderId, code, email } = request.body;
 
         try {
-            const newUser = await prismaClient.student.create({
-                data: {
+            const createStudentService = new CreateStudentService();
+            const newStudent = await createStudentService.createStudent(
+                {
                     id,
                     name,
                     identityProviderId,
                     code,
                     email,
                 },
-            });
+            );
 
-            return response.status(201).json(newUser);
+            if (newStudent instanceof Error) {
+                return response.status(400).json({ error: newStudent.message });
+            }
+
+            return response.status(201).json(newStudent);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while creating the user." });
+            if (error instanceof Error) {
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack,
+                });
+            }
         }
     }
 }

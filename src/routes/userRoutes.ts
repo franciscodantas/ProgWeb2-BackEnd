@@ -30,14 +30,14 @@ const createProfessorController = new CreateProfessorController();
 
 
 userRoutes.get('/api/users/students', getStudentsController.handle);
-userRoutes.get('/api/user/students/:id', getStudentsByIdController.handle);
+userRoutes.get('/api/users/students/:id', getStudentsByIdController.handle);
 userRoutes.post('/api/users/students', createStudentController.handle);
 userRoutes.put('/api/users/students/:id', updateStudentController.handle);
 userRoutes.patch('/api/users/students/:id', patchStudentController.handle);
 userRoutes.delete('/api/users/students/:id', deleteStudentController.handle);
 
 userRoutes.get('/api/users/professors', getProfessorsController.handle);
-userRoutes.get('/api/user/professors/:id', getProfessorByIdController.handle);
+userRoutes.get('/api/users/professors/:id', getProfessorByIdController.handle);
 userRoutes.post('/api/users/professors/', createProfessorController.handle);
 userRoutes.put('/api/users/professors/:id', updateProfessorController.handle);
 userRoutes.patch('/api/users/professors/:id', patchProfessorController.handle);

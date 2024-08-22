@@ -11,11 +11,20 @@ export class PatchProfessorController {
 
         try {
             const patchProfessorService = new PatchProfessorService();
-            const updatedUser = patchProfessorService.patchProfessor(parseInt(id), updates);
+            const updatedUser = await patchProfessorService.patchProfessor(parseInt(id), updates);
 
             return response.status(200).json(updatedUser);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while partially updating the user." });
+            if (error instanceof Error) {
+                if (error.message === "Professor not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack,
+                });
+            }
         }
     }
 }
