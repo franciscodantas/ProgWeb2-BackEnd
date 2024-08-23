@@ -1,20 +1,28 @@
-import { Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
-
-const prismaClient = new PrismaClient()
+import { Request, Response } from 'express';
+import { DeleteQuestionService } from '../../services/questionn/DeleteQuestionService';
 
 export class DeleteQuestionController {
-    async handle(request: Request, response: Response){
-        const { id } = request.params
+    async handle(request: Request, response: Response) {
+        const { id } = request.params;
 
         try {
-            await prismaClient.question.delete({
-                where: { id: Number(id) }
-            })
+            const questionService = new DeleteQuestionService();
+            await questionService.deleteQuestion(Number(id));
 
-            return response.status(204).send()
+            return response.status(204).send();
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while deleting the question." })
+            if (error instanceof Error) {
+                if (error.message === "Question not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack
+                });
+            } else {
+                return response.status(500).json({ error: "An unexpected error occurred." });
+            }
         }
     }
 }

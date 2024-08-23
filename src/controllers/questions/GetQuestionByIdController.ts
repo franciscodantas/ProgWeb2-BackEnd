@@ -1,29 +1,27 @@
-import { Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
-
-const prismaClient = new PrismaClient()
-
+import { Request, Response } from 'express';
+import { GetQuestionByIdService } from '../../services/questionn/GetQuestionByIdService';
 export class GetQuestionByIdController {
-    async handle(request: Request, response: Response){
-        const { id } = request.params
+    async handle(request: Request, response: Response) {
+        const { id } = request.params;
 
         try {
-            const question = await prismaClient.question.findUnique({
-                where: { id: Number(id) },
-                include: {
-                    student: true,
-                    professor: true,
-                    discipline: true
-                }
-            })
+            const questionService = new GetQuestionByIdService();
+            const result = await questionService.getQuestionById(Number(id));
 
-            if (!question) {
-                return response.status(404).json({ error: "Question not found." })
-            }
-
-            return response.status(200).json(question)
+            return response.status(200).json(result);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while fetching the question." })
+            if (error instanceof Error) {
+                if (error.message === "Question not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack
+                });
+            } else {
+                return response.status(500).json({ error: "An unexpected error occurred." });
+            }
         }
     }
 }

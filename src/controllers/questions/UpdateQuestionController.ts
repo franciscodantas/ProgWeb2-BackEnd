@@ -1,30 +1,32 @@
-import { Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
-
-const prismaClient = new PrismaClient()
+import { Request, Response } from 'express';
+import { UpdateQuestionService } from '../../services/questionn/UpdateQuestionService';
 
 export class UpdateQuestionController {
-    async handle(request: Request, response: Response){
-        const { id } = request.params
-        const { title, content, answer, image, professorId, studentId, disciplineId }  = request.body
+    async handle(request: Request, response: Response) {
+        const { id } = request.params;
+        const { title, content, answer, image } = request.body;
 
         try {
-            const updatedQuestion = await prismaClient.question.update({
-                where: { id: Number(id) },
-                data: {
-                    title,
-                    content,
-                    answer,
-                    image,
-                    professorId,
-                    studentId,
-                    disciplineId
-                }
-            })
+            const questionService = new UpdateQuestionService();
+            const updatedQuestion = await questionService.updateQuestion(Number(id), {
+                title,
+                content,
+                answer,
+                image
+            });
 
-            return response.status(200).json(updatedQuestion)
+            return response.status(200).json(updatedQuestion);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while updating the question." })
+            if (error instanceof Error) {
+                if (error.message === "Question not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack,
+                });
+            } 
         }
     }
 }
