@@ -9,13 +9,12 @@ export class GetAdminByIdController {
             const adminService = new GetAdminByIdService();
             const admin = await adminService.getAdminById(Number(id));
 
-            if (admin instanceof Error) {
-                return response.status(404).json({ error: admin.message });
-            }
-
             return response.status(200).json(admin);
         } catch (error) {
             if (error instanceof Error) {
+                if (error.message === "Adm not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
                 return response.status(500).json({
                     error: "An unexpected error occurred.",
                     info: error.message,

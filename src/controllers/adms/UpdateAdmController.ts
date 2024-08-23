@@ -10,13 +10,12 @@ export class UpdateAdmController {
             const admService = new UpdateAdmService();
             const updatedAdm = await admService.updateAdm(parseInt(id), name, email);
 
-            if (updatedAdm instanceof Error) {
-                return response.status(404).json({ error: updatedAdm.message });
-            }
-
             return response.status(200).json(updatedAdm);
         } catch (error) {
             if (error instanceof Error) {
+                if (error.message === "Adm not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
                 return response.status(500).json({
                     error: "An unexpected error occurred.",
                     info: error.message,

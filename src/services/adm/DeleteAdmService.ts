@@ -11,7 +11,7 @@ export class DeleteAdmService {
             });
             return deletedAdm;
         } catch (error) {
-            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+            if (error instanceof PrismaClientKnownRequestError) {
                 throw new Error("Adm not found.");
             }
             console.error('Error deleting ADM:', error);
