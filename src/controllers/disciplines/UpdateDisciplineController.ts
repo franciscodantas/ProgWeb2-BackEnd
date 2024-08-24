@@ -8,7 +8,7 @@ export class UpdateDisciplineController {
 
         try {
             const disciplineService = new UpdateDisciplineService();
-            const result = await disciplineService.updateDiscipline(Number(id), {
+            const result = await disciplineService.updateDiscipline(parseInt(id), {
                 courseCode,
                 curriculumCode,
                 subjectCode,

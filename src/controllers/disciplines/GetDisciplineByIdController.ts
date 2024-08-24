@@ -7,7 +7,7 @@ export class GetDisciplineByIdController {
 
         try {
             const disciplineService = new GetDisciplineByIdService();
-            const result = await disciplineService.getDisciplineById(Number(id));
+            const result = await disciplineService.getDisciplineById(parseInt(id));
 
             if (result instanceof Error) {
                 return response.status(404).json({ error: result.message });

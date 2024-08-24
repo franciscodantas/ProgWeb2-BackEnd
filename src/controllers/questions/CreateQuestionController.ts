@@ -1,11 +1,18 @@
 import { Request, Response } from 'express';
 import { CreateQuestionService } from '../../services/questionn/CreateQuestionService';
+import { QuestionValidation } from '../../validation/QuestionValidation';
 
 export class CreateQuestionController {
     async handle(request: Request, response: Response) {
         const { title, content, answer, image, professorId, studentId, disciplineId } = request.body;
 
         try {
+
+            const validationErrors = QuestionValidation.validate({ title, content, answer, image, professorId, studentId, disciplineId });
+
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
 
             const createQuestionService = new CreateQuestionService();
             const question = await createQuestionService.createQuestion({

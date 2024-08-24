@@ -7,7 +7,7 @@ export class DeleteQuestionController {
 
         try {
             const questionService = new DeleteQuestionService();
-            await questionService.deleteQuestion(Number(id));
+            await questionService.deleteQuestion(parseInt(id));
 
             return response.status(204).send();
         } catch (error) {

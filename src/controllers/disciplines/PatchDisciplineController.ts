@@ -8,7 +8,7 @@ export class PatchDisciplineController {
 
         try {
             const disciplineService = new PatchDisciplineService();
-            const result = await disciplineService.patchDiscipline(Number(id), updates);
+            const result = await disciplineService.patchDiscipline(parseInt(id), updates);
 
             if (result instanceof Error) {
                 return response.status(404).json({ error: result.message });

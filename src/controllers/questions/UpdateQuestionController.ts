@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UpdateQuestionService } from '../../services/questionn/UpdateQuestionService';
+import { QuestionValidation } from '../../validation/QuestionValidation';
 
 export class UpdateQuestionController {
     async handle(request: Request, response: Response) {
@@ -7,6 +8,12 @@ export class UpdateQuestionController {
         const { title, content, answer, image } = request.body;
 
         try {
+            const validationErrors = QuestionValidation.validateUpdate({ title, content, answer, image });
+
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
+            
             const questionService = new UpdateQuestionService();
             const updatedQuestion = await questionService.updateQuestion(Number(id), {
                 title,

@@ -6,7 +6,7 @@ export class GetQuestionByIdController {
 
         try {
             const questionService = new GetQuestionByIdService();
-            const result = await questionService.getQuestionById(Number(id));
+            const result = await questionService.getQuestionById(parseInt(id));
 
             return response.status(200).json(result);
         } catch (error) {
