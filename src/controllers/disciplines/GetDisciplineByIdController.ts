@@ -9,13 +9,12 @@ export class GetDisciplineByIdController {
             const disciplineService = new GetDisciplineByIdService();
             const result = await disciplineService.getDisciplineById(parseInt(id));
 
-            if (result instanceof Error) {
-                return response.status(404).json({ error: result.message });
-            }
-
             return response.status(200).json(result);
         } catch (error) {
             if (error instanceof Error) {
+                if (error.message === "Discipline not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
                 return response.status(500).json({
                     error: "An unexpected error occurred.",
                     info: error.message,

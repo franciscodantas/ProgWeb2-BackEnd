@@ -21,7 +21,16 @@ export class UpdateProfessorController {
 
             return response.status(200).json(updatedUser);
         } catch (error) {
-            return response.status(500).json({ error: "An error occurred while updating the user." });
+            if (error instanceof Error) {
+                if (error.message === "Professor not found.") {
+                    return response.status(404).json({ error: error.message });
+                }
+                return response.status(500).json({
+                    error: "An unexpected error occurred.",
+                    info: error.message,
+                    stackTrace: error.stack,
+                });
+            }
         }
     }
 }

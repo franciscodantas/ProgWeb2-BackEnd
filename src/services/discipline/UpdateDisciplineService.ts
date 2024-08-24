@@ -19,7 +19,7 @@ export class UpdateDisciplineService {
 
             return updatedDiscipline;
         } catch (error) {
-            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+            if (error instanceof PrismaClientKnownRequestError) {
                 throw new Error("Discipline not found.");
             }
             console.error('Error deleting discipline:', error);

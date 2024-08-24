@@ -20,8 +20,6 @@ export class DeleteQuestionController {
                     info: error.message,
                     stackTrace: error.stack
                 });
-            } else {
-                return response.status(500).json({ error: "An unexpected error occurred." });
             }
         }
     }
