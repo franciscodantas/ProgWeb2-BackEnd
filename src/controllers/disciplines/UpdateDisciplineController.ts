@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UpdateDisciplineService } from '../../services/discipline/UpdateDisciplineService';
+import { DisciplineValidation } from '../../validation/DisciplineValidation';
 
 export class UpdateDisciplineController {
     async handle(request: Request, response: Response) {
@@ -7,6 +8,10 @@ export class UpdateDisciplineController {
         const { courseCode, curriculumCode, subjectCode, name, type } = request.body;
 
         try {
+            const validationErrors = DisciplineValidation.validate({ courseCode, curriculumCode, subjectCode, name, type });
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
             const disciplineService = new UpdateDisciplineService();
             const result = await disciplineService.updateDiscipline(parseInt(id), {
                 courseCode,

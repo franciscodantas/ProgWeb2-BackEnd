@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PatchDisciplineService } from '../../services/discipline/PatchDisciplineService';
+import { DisciplineValidation } from '../../validation/DisciplineValidation';
 
 export class PatchDisciplineController {
     async handle(request: Request, response: Response) {
@@ -7,6 +8,10 @@ export class PatchDisciplineController {
         const updates = request.body;
 
         try {
+            const validationErrors = DisciplineValidation.validatePatch(updates);
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
             const disciplineService = new PatchDisciplineService();
             const result = await disciplineService.patchDiscipline(parseInt(id), updates);
 

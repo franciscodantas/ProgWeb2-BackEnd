@@ -1,11 +1,16 @@
 import { Request, Response } from 'express';
 import { CreateDisciplineService } from '../../services/discipline/CreateDisciplineService';
+import { DisciplineValidation } from '../../validation/DisciplineValidation';
 
 export class CreateDisciplineController {
     async handle(request: Request, response: Response) {
         const { courseCode, curriculumCode, subjectCode, name, type } = request.body;
 
         try {
+            const validationErrors = DisciplineValidation.validate({ courseCode, curriculumCode, subjectCode, name, type });
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
             const disciplineService = new CreateDisciplineService();
             const newDiscipline = await disciplineService.createDiscipline({
                 courseCode,
