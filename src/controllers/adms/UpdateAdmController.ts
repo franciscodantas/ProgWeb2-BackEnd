@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UpdateAdmService } from '../../services/adm/UpdateAdmService';
+import { AdmValidation } from '../../validation/AdmValidation';
 
 export class UpdateAdmController {
     async handle(request: Request, response: Response) {
@@ -7,6 +8,10 @@ export class UpdateAdmController {
         const { name, email } = request.body;
 
         try {
+            const validationErrors = AdmValidation.validate({ name, email });
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
             const admService = new UpdateAdmService();
             const updatedAdm = await admService.updateAdm(parseInt(id), name, email);
 

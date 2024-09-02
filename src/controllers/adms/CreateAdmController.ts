@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { CreateAdmService } from '../../services/adm/CreateAdmService';
+import { AdmValidation } from '../../validation/AdmValidation';
 
 export class CreateAdmController {
 
@@ -8,6 +9,10 @@ export class CreateAdmController {
         const { name, email } = request.body;
 
         try {
+            const validationErrors = AdmValidation.validate({ name, email });
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
             const admService = new CreateAdmService();
             const newAdm = await admService.createAdm(name, email);
 

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PatchAdmService } from '../../services/adm/PatchAdmService';
+import { AdmValidation } from '../../validation/AdmValidation';
 
 export class PatchAdmController {
     async handle(request: Request, response: Response) {
@@ -7,6 +8,10 @@ export class PatchAdmController {
         const updates = request.body;
 
         try {
+            const validationErrors = AdmValidation.validatePatch(updates);
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
             const admService = new PatchAdmService();
             const updatedAdm = await admService.patchAdm(parseInt(id), updates);
 
