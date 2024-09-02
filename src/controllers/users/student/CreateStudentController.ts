@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { CreateStudentService } from '../../../services/user/student/CreateStudentService';
+import { StudentValidation } from '../../../validation/StudentValidation';
 
 const prismaClient = new PrismaClient();
 
@@ -9,6 +10,10 @@ export class CreateStudentController {
         const { id, name, identityProviderId, code, email } = request.body;
 
         try {
+            const validationErrors = StudentValidation.validate({ id, name, identityProviderId, code, email });
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
             const createStudentService = new CreateStudentService();
             const newStudent = await createStudentService.createStudent(
                 {
