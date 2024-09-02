@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { PrismaClient } from '@prisma/client'
-import { GetAllQuestionsService } from '../../services/questionn/GetAllQuestionsService'
+import { GetAllQuestionsService } from '../../services/question/GetAllQuestionsService'
 
 const prismaClient = new PrismaClient()
 

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CreateQuestionService } from '../../services/questionn/CreateQuestionService';
+import { CreateQuestionService } from '../../services/question/CreateQuestionService';
 import { QuestionValidation } from '../../validation/QuestionValidation';
 
 export class CreateQuestionController {

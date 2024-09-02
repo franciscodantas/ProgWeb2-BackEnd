@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { UpdateProfessorService } from '../../../services/user/professor/UpdateProfessorService';
+import { ProfessorValidation } from '../../../validation/ProfessorValidation';
 
 const prismaClient = new PrismaClient();
 
@@ -10,6 +11,10 @@ export class UpdateProfessorController {
         const {name, identityProviderId, code, email, disciplines }= request.body;
 
         try {
+            const validationErrors = ProfessorValidation.validate({ id, name, identityProviderId, code, email, disciplines });
+            if (validationErrors) {
+                return response.status(400).json({ errors: validationErrors });
+            }
             const updatedProfessorService = new UpdateProfessorService();
             const updatedUser = await updatedProfessorService.updateProfessor(parseInt(id), {
                 name,

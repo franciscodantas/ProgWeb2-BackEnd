@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.18.0",
+    "@prisma/client": "^5.19.0",
     "@types/multer": "^1.4.11",
     "express": "^4.19.2",
     "joi": "^17.13.3",

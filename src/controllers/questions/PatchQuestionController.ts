@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { PatchQuestionService } from '../../services/questionn/PatchQuestionService';
+import { PatchQuestionService } from '../../services/question/PatchQuestionService';
 import { QuestionValidation } from '../../validation/QuestionValidation';
 
 export class PatchQuestionController {

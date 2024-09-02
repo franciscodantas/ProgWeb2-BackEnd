@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { GetQuestionByIdService } from '../../services/questionn/GetQuestionByIdService';
+import { GetQuestionByIdService } from '../../services/question/GetQuestionByIdService';
 export class GetQuestionByIdController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
