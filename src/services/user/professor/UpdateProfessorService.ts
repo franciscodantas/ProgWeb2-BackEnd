@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { BcryptUtils } from '../../../utils/BcryptUtil';
 
 const prismaClient = new PrismaClient();
 
@@ -10,8 +11,10 @@ export class UpdateProfessorService {
         code: string;
         email: string;
         disciplines: number[];
+        password: string;
     }) {
         try {
+            const hash = await BcryptUtils.hashPassword(data.password);
             const updatedProfessor = await prismaClient.professor.update({
                 where: { id },
                 data: {

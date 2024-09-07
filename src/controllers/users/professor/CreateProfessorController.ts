@@ -4,10 +4,10 @@ import { ProfessorValidation } from '../../../validation/ProfessorValidation';
 
 export class CreateProfessorController {
     async handle(request: Request, response: Response) {
-        const { id, name, identityProviderId, code, email, disciplines } = request.body;
+        const { id, name, identityProviderId, code, email, disciplines, password } = request.body;
 
         try {
-            const validationErrors = ProfessorValidation.validate({ id, name, identityProviderId, code, email, disciplines });
+            const validationErrors = ProfessorValidation.validate({ id, name, identityProviderId, code, email, disciplines, password });
             if (validationErrors) {
                 return response.status(400).json({ errors: validationErrors });
             }
@@ -19,6 +19,7 @@ export class CreateProfessorController {
                 code,
                 email,
                 disciplines,
+                password
             });
 
             if (newProfessor instanceof Error) {

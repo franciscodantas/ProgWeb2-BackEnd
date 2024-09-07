@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { BcryptUtils } from '../../../utils/BcryptUtil';
 
 const prismaClient = new PrismaClient();
 
@@ -10,8 +11,10 @@ export class CreateProfessorService {
         code: string;
         email: string;
         disciplines: number[];
+        password: string;
     }) {
         try {
+            const hash = await BcryptUtils.hashPassword(data.password);
             const newProfessor = await prismaClient.professor.create({
                 data: {
                     id: data.id,
@@ -22,6 +25,7 @@ export class CreateProfessorService {
                     disciplines: {
                         connect: data.disciplines.map(id => ({ id })),
                     },
+                    password: hash
                 },
             });
             return newProfessor || new Error("Teacher already registered");

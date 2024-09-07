@@ -8,10 +8,10 @@ const prismaClient = new PrismaClient();
 export class UpdateProfessorController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
-        const {name, identityProviderId, code, email, disciplines }= request.body;
+        const {name, identityProviderId, code, email, disciplines, password }= request.body;
 
         try {
-            const validationErrors = ProfessorValidation.validate({ id, name, identityProviderId, code, email, disciplines });
+            const validationErrors = ProfessorValidation.validate({ id, name, identityProviderId, code, email, disciplines, password });
             if (validationErrors) {
                 return response.status(400).json({ errors: validationErrors });
             }
@@ -22,6 +22,7 @@ export class UpdateProfessorController {
                 code,
                 email,
                 disciplines,
+                password
             });
 
             return response.status(200).json(updatedUser);
