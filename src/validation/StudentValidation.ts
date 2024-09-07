@@ -28,6 +28,12 @@ export class StudentValidation {
       'string.email': 'The email must be a valid email.',
       'string.empty': 'The email cannot be empty.',
       'any.required': 'The email is required.',
+    }),
+    password: Joi.string().required().messages({
+      'string.base': 'The password must be a string.',
+      'string.password': 'The password must be a valid password.',
+      'string.empty': 'The password cannot be empty.',
+      'any.required': 'The password is required.',
     })
   });
 
@@ -48,6 +54,12 @@ export class StudentValidation {
       'string.base': 'The email must be a string.',
       'string.email': 'The email must be a valid email.',
       'string.empty': 'The email cannot be empty.',
+    }),
+    password: Joi.string().optional().messages({
+      'string.base': 'The password must be a string.',
+      'string.password': 'The password must be a valid password.',
+      'string.empty': 'The password cannot be empty.',
+      'any.required': 'The password is required.',
     })
   }).min(1).messages({
     'object.min': 'At least one field must be provided for update.',

@@ -7,10 +7,10 @@ const prismaClient = new PrismaClient();
 
 export class CreateStudentController {
     async handle(request: Request, response: Response) {
-        const { id, name, identityProviderId, code, email } = request.body;
+        const { id, name, identityProviderId, code, email, password } = request.body;
 
         try {
-            const validationErrors = StudentValidation.validate({ id, name, identityProviderId, code, email });
+            const validationErrors = StudentValidation.validate({ id, name, identityProviderId, code, email, password});
             if (validationErrors) {
                 return response.status(400).json({ errors: validationErrors });
             }
@@ -22,6 +22,7 @@ export class CreateStudentController {
                     identityProviderId,
                     code,
                     email,
+                    password
                 },
             );
 

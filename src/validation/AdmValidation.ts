@@ -32,7 +32,7 @@ export class AdmValidation {
       'string.email': 'The email must be a valid email.',
       'string.empty': 'The email cannot be empty.',
     }),
-    password: Joi.string().required().messages({
+    password: Joi.string().optional().messages({
       'string.base': 'The password must be a string.',
       'string.password': 'The password must be a valid password.',
       'string.empty': 'The password cannot be empty.',
