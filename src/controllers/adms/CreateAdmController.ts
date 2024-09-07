@@ -6,15 +6,15 @@ export class CreateAdmController {
 
 
     async handle(request: Request, response: Response) {
-        const { name, email } = request.body;
+        const { name, email, password } = request.body;
 
         try {
-            const validationErrors = AdmValidation.validate({ name, email });
+            const validationErrors = AdmValidation.validate({ name, email, password });
             if (validationErrors) {
                 return response.status(400).json({ errors: validationErrors });
             }
             const admService = new CreateAdmService();
-            const newAdm = await admService.createAdm(name, email);
+            const newAdm = await admService.createAdm(name, email, password);
 
             if (newAdm instanceof Error) {
                 return response.status(400).json({ error: "An error occurred while creating the adm.", info: newAdm });

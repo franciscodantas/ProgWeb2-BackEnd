@@ -5,15 +5,15 @@ import { AdmValidation } from '../../validation/AdmValidation';
 export class UpdateAdmController {
     async handle(request: Request, response: Response) {
         const { id } = request.params;
-        const { name, email } = request.body;
+        const { name, email, password } = request.body;
 
         try {
-            const validationErrors = AdmValidation.validate({ name, email });
+            const validationErrors = AdmValidation.validate({ name, email, password });
             if (validationErrors) {
                 return response.status(400).json({ errors: validationErrors });
             }
             const admService = new UpdateAdmService();
-            const updatedAdm = await admService.updateAdm(parseInt(id), name, email);
+            const updatedAdm = await admService.updateAdm(parseInt(id), name, email, password);
 
             return response.status(200).json(updatedAdm);
         } catch (error) {
