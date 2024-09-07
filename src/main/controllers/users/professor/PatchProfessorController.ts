@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { PatchProfessorService } from '../../../services/user/professor/PatchProfessorService';
 import { ProfessorValidation } from '../../../validation/ProfessorValidation';
-
+import { PatchProfessorService } from '../../../services/user/professor/PatchProfessorService';
 const prismaClient = new PrismaClient();
 
 export class PatchProfessorController {

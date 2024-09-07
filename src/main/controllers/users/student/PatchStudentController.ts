@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { PatchStudentService } from '../../../services/user/student/PatchStudentService';
 import { StudentValidation } from '../../../validation/StudentValidation';
+import { PatchStudentService } from '../../../services/user/student/PatchStudentService';
 
 const prismaClient = new PrismaClient();
 

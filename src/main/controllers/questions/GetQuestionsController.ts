@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { PrismaClient } from '@prisma/client'
-import { GetAllQuestionsService } from '../../services/question/GetAllQuestionsService'
 import { PaginationValidation } from '../../validation/PaginationValidation';
+import { GetAllQuestionsService } from '../../services/question/GetAllQuestionsService';
 
 const prismaClient = new PrismaClient()
 

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { UpdateAdmService } from '../../services/adm/UpdateAdmService';
 import { AdmValidation } from '../../validation/AdmValidation';
+import { UpdateAdmService } from '../../services/adm/UpdateAdmService';
 
 export class UpdateAdmController {
     async handle(request: Request, response: Response) {

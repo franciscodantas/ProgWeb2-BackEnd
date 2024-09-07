@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
-import { questionRoutes } from './main/routes/questionRoutes'
-import { disciplineRoutes } from './main/routes/disciplineRoutes';
-import { userRoutes } from './main/routes/userRoutes';
-import { admRoutes } from './main/routes/admRoutes';
+import { questionRoutes } from './routes/questionRoutes';
+import { disciplineRoutes } from './routes/disciplineRoutes';
+import { userRoutes } from './routes/userRoutes';
+import { admRoutes } from './routes/admRoutes';
 
 const app = express();
 const port = 3000;

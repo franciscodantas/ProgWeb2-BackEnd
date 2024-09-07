@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { CreateAdmService } from '../../services/adm/CreateAdmService';
 import { AdmValidation } from '../../validation/AdmValidation';
+import { CreateAdmService } from '../../services/adm/CreateAdmService';
 
 export class CreateAdmController {
 

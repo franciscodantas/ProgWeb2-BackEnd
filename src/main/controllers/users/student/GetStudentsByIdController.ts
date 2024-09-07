@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { PrismaClient } from '@prisma/client'
-import { GetStudentByIdService } from '../../../services/user/student/GetStudentByIdService'
+import { GetStudentByIdService } from '../../../services/user/student/GetStudentByIdService';
 
 const prismaClient = new PrismaClient()
 

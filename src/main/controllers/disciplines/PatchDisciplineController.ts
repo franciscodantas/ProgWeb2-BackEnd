@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { PatchDisciplineService } from '../../services/discipline/PatchDisciplineService';
 import { DisciplineValidation } from '../../validation/DisciplineValidation';
+import { PatchDisciplineService } from '../../services/discipline/PatchDisciplineService';
 
 export class PatchDisciplineController {
     async handle(request: Request, response: Response) {

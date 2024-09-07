@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { CreateProfessorService } from '../../../services/user/professor/CreateProfessorService';
 import { ProfessorValidation } from '../../../validation/ProfessorValidation';
+import { CreateProfessorService } from '../../../services/user/professor/CreateProfessorService';
 
 export class CreateProfessorController {
     async handle(request: Request, response: Response) {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { CreateQuestionService } from '../../services/question/CreateQuestionService';
 import { QuestionValidation } from '../../validation/QuestionValidation';
+import { CreateQuestionService } from '../../services/question/CreateQuestionService';
 
 export class CreateQuestionController {
     async handle(request: Request, response: Response) {
