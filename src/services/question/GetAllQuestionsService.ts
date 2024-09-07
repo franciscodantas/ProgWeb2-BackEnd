@@ -4,9 +4,12 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 const prismaClient = new PrismaClient();
 
 export class GetAllQuestionsService {
-    async getAll() {
+    async getAll(pageNumber?: any, limitNumber?: any) {
         try {
+            const skip = (pageNumber - 1) * limitNumber;
             const questions = await prismaClient.question.findMany({
+                skip: skip,
+                take: limitNumber,
                 include: {
                     student: true,
                     professor: true,
