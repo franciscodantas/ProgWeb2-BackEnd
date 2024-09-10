@@ -3,6 +3,7 @@ import { questionRoutes } from './routes/questionRoutes';
 import { disciplineRoutes } from './routes/disciplineRoutes';
 import { userRoutes } from './routes/userRoutes';
 import { admRoutes } from './routes/admRoutes';
+import loginRouter from './routes/loginRoutes';
 
 const app = express();
 const port = 3000;
@@ -11,6 +12,7 @@ app.use(questionRoutes);
 app.use(disciplineRoutes);
 app.use(userRoutes);
 app.use(admRoutes);
+app.use(loginRouter)
 
 
 app.get('/', (req: Request, res: Response) => {
