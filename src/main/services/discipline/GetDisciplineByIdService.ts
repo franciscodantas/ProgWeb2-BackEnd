@@ -12,7 +12,9 @@ export class GetDisciplineByIdService {
                     questions: true
                 }
             });
-
+            if (!discipline) {
+                throw new PrismaClientKnownRequestError("Discipline not found", {code: 'P2025', clientVersion: ''});
+            }
             return discipline;
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
