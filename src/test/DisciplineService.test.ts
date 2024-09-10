@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { CreateDisciplineService } from '../main/services/discipline/CreateDisciplineService';
 import { describe, expect, test, beforeAll, afterAll } from 'vitest';
 import { DeleteDisciplineService } from '../main/services/discipline/DeleteDisciplineService';
+import { GetAllDisciplineService } from '../main/services/discipline/GetAllDisciplineService';
 
 const prismaClient = new PrismaClient();
 
@@ -88,4 +89,65 @@ describe('DeleteDisciplineService', () => {
       .rejects
       .toThrow('Discipline not found.');
   });
+});
+
+
+
+describe('GetAllDisciplineService', () => {
+    const getAllDisciplineService = new GetAllDisciplineService();
+    const testDisciplines = [
+        {
+        courseCode: 'CS101',
+        curriculumCode: 'CUR2024',
+        subjectCode: 'SUB123',
+        name: 'Introduction to Computer Science',
+        type: 'Core',
+        },
+        {
+        courseCode: 'CS102',
+        curriculumCode: 'CUR2024',
+        subjectCode: 'SUB124',
+        name: 'Data Structures',
+        type: 'Core',
+        },
+        {
+        courseCode: 'CS103',
+        curriculumCode: 'CUR2024',
+        subjectCode: 'SUB125',
+        name: 'Algorithms',
+        type: 'Core',
+        },
+    ];
+
+    beforeAll(async () => {
+        await prismaClient.discipline.createMany({
+        data: testDisciplines,
+        });
+    });
+
+    afterAll(async () => {
+        await prismaClient.discipline.deleteMany({});
+        await prismaClient.$disconnect();
+    });
+
+    test('deve obter todas as disciplinas sem paginação', async () => {
+        const disciplines = await getAllDisciplineService.getAll();
+
+        expect(disciplines).toBeDefined();
+        expect(disciplines.length).toBe(testDisciplines.length);
+        expect(disciplines[0]).toHaveProperty('courseCode', 'CS101');
+        expect(disciplines[1]).toHaveProperty('courseCode', 'CS102');
+        expect(disciplines[2]).toHaveProperty('courseCode', 'CS103');
+    });
+
+    test('deve obter disciplinas com paginação', async () => {
+        const pageNumber = 1;
+        const limitNumber = 2;
+        const disciplines = await getAllDisciplineService.getAll(pageNumber, limitNumber);
+
+        expect(disciplines).toBeDefined();
+        expect(disciplines.length).toBe(limitNumber);
+        expect(disciplines[0]).toHaveProperty('courseCode', 'CS101');
+        expect(disciplines[1]).toHaveProperty('courseCode', 'CS102');
+    });
 });
