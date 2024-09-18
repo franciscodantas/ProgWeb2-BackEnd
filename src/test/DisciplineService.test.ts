@@ -13,6 +13,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await prismaClient.discipline.deleteMany({});
   await prismaClient.$disconnect();
 });
 
@@ -21,11 +22,9 @@ describe('CreateDisciplineService', () => {
   const createDisciplineService = new CreateDisciplineService();
 
   afterAll(async () => {
-    if (createdDisciplineId) {
-      await prismaClient.discipline.delete({ where: { id: createdDisciplineId } });
-    }
+    await prismaClient.discipline.deleteMany({});
     await prismaClient.$disconnect();
-  });
+});
 
   test('deve criar uma nova disciplina com sucesso', async () => {
     const disciplineData = {
@@ -70,8 +69,9 @@ describe('DeleteDisciplineService', () => {
   });
 
   afterAll(async () => {
+    await prismaClient.discipline.deleteMany({});
     await prismaClient.$disconnect();
-  });
+});
 
   test('deve excluir uma disciplina com sucesso', async () => {
     const deletedDiscipline = await deleteDisciplineService.deleteDiscipline(testDisciplineId);
