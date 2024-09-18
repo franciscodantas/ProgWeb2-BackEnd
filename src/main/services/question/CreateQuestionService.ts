@@ -30,18 +30,18 @@ export class CreateQuestionService {
                 throw new Error("Question with the same title already exists.");
             }
 
-            if(data.studentId){
-                const existiongStudent = await prismaClient.student.findUnique({
-                    where: {id: data.studentId}
-                })
-                if(!existiongStudent){
+            if (data.studentId) {
+                const existingStudent = await prismaClient.student.findUnique({
+                    where: { id: data.studentId },
+                });
+                if (!existingStudent) {
                     throw new Error("Author not found.");
                 }
-            }else{
-                const existiongProfessor = await prismaClient.professor.findUnique({
-                    where: {id: data.professorId}
-                })
-                if(!existiongProfessor){
+            } else {
+                const existingProfessor = await prismaClient.professor.findUnique({
+                    where: { id: data.professorId },
+                });
+                if (!existingProfessor) {
                     throw new Error("Author not found.");
                 }
             }
@@ -65,10 +65,8 @@ export class CreateQuestionService {
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
                 console.error('Prisma error:', error);
-            } else {
-                console.error('Error creating question:', error);
             }
-            return error;
+            throw error;
         }
     }
 }
