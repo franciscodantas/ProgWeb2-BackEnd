@@ -1,6 +1,20 @@
 import { PrismaClient } from '@prisma/client';
 import { BcryptUtils } from '../../utils/BcryptUtil';
 import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
+
+interface UserPayload {
+    email: string;
+    role: string;
+}
 
 const prismaClient = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
@@ -42,3 +56,26 @@ export class AuthService {
         });
     }
 }
+
+export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+export const authorizeRoles = (...allowedRoles: string[]) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const user = req.user as UserPayload;
+        if (!user || !allowedRoles.includes(user.role)) {
+            return res.sendStatus(403);
+        }
+        next();
+    };
+};

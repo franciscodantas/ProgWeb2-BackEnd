@@ -5,6 +5,7 @@ import { CreateDisciplineController} from '../controllers/disciplines/CreateDisc
 import { PatchDisciplineController } from '../controllers/disciplines/PatchDisciplineController';
 import { UpdateDisciplineController } from '../controllers/disciplines/UpdateDisciplineController';
 import { DeleteDisciplineController } from '../controllers/disciplines/DeleteDisciplineController';
+import { authenticateToken, authorizeRoles } from '../services/auth/AuthService';
 
 const disciplineRoutes = Router();
 
@@ -17,7 +18,7 @@ const deleteDisciplineController = new DeleteDisciplineController();
 
 disciplineRoutes.get('/api/disciplines', getAllDisciplinesController.handle);
 disciplineRoutes.get('/api/disciplines/:id', getDisciplineByIdController.handle);
-disciplineRoutes.post('/api/disciplines', createDisciplineController.handle);
+disciplineRoutes.post('/api/disciplines', authenticateToken, authorizeRoles('Admin'), createDisciplineController.handle);
 disciplineRoutes.patch('/api/disciplines/:id', patchDisciplineController.handle);
 disciplineRoutes.delete('/api/disciplines/:id', deleteDisciplineController.handle);
 disciplineRoutes.put('/api/disciplines/:id', updateDisciplineController.handle);

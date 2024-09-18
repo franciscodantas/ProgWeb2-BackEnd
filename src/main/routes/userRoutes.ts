@@ -11,6 +11,7 @@ import { CreateProfessorController } from '../controllers/users/professor/Create
 import { DeleteProfessorController } from '../controllers/users/professor/DeleteProfessorController';
 import { UpdateProfessorController } from '../controllers/users/professor/UpdateProfessorController';
 import { PatchProfessorController } from '../controllers/users/professor/PatchProfessorController';
+import { authenticateToken, authorizeRoles } from '../services/auth/AuthService';
 
 const userRoutes = Router();
 
@@ -29,16 +30,16 @@ const deleteProfessorController = new DeleteProfessorController();
 const createProfessorController = new CreateProfessorController();
 
 
-userRoutes.get('/api/users/students', getStudentsController.handle);
+userRoutes.get('/api/users/students', authenticateToken, authorizeRoles('Admin'), getStudentsController.handle);
 userRoutes.get('/api/users/students/:id', getStudentsByIdController.handle);
 userRoutes.post('/api/users/students', createStudentController.handle);
 userRoutes.put('/api/users/students/:id', updateStudentController.handle);
 userRoutes.patch('/api/users/students/:id', patchStudentController.handle);
 userRoutes.delete('/api/users/students/:id', deleteStudentController.handle);
 
-userRoutes.get('/api/users/professors', getProfessorsController.handle);
+userRoutes.get('/api/users/professors', authenticateToken, authorizeRoles('Admin'), getProfessorsController.handle);
 userRoutes.get('/api/users/professors/:id', getProfessorByIdController.handle);
-userRoutes.post('/api/users/professors/', createProfessorController.handle);
+userRoutes.post('/api/users/professors/', authenticateToken, authorizeRoles('Admin'), createProfessorController.handle);
 userRoutes.put('/api/users/professors/:id', updateProfessorController.handle);
 userRoutes.patch('/api/users/professors/:id', patchProfessorController.handle);
 userRoutes.delete('/api/users/professors/:id', deleteProfessorController.handle);
