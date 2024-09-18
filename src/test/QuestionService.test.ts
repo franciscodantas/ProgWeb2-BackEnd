@@ -1,6 +1,7 @@
-import { describe, expect, test, beforeAll, afterAll } from 'vitest';
+import { describe, expect, test, beforeAll, afterAll, afterEach } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { CreateQuestionService } from '../main/services/question/CreateQuestionService';
+import { DeleteQuestionService } from '../main/services/question/DeleteQuestionService';
 
 const prismaClient = new PrismaClient();
 const createQuestionService = new CreateQuestionService();
@@ -146,5 +147,47 @@ describe('CreateQuestionService', () => {
         disciplineId: disciplineId,
       })
     ).rejects.toThrow('Question with the same title already exists.');
+  });
+});
+
+describe('DeleteQuestionService', () => {
+  const deleteQuestionService = new DeleteQuestionService();
+  let testQuestionId: number;
+
+  beforeAll(async () => {
+    const createdQuestion = await prismaClient.question.create({
+      data: {
+        title: 'Questão para teste de exclusão',
+        content: 'Conteúdo da questão',
+        answer: 'Resposta da questão',
+        image: Buffer.from('imagem-base64', 'base64'),
+        professorId: professorId,
+        disciplineId: disciplineId,
+      }
+    });
+    testQuestionId = createdQuestion.id;
+  });
+
+  afterAll(async () => {
+    await prismaClient.$disconnect();
+  });
+
+  test('deve excluir uma questão existente', async () => {
+    const deletedQuestion = await deleteQuestionService.deleteQuestion(testQuestionId);
+    
+    expect(deletedQuestion).toHaveProperty('id', testQuestionId);
+    expect(deletedQuestion.title).toBe('Questão para teste de exclusão');
+
+    await expect(
+      prismaClient.question.findUnique({
+        where: { id: testQuestionId }
+      })
+    ).resolves.toBeNull();
+  });
+
+  test('deve lançar um erro se a questão não existir', async () => {
+    await expect(
+      deleteQuestionService.deleteQuestion(999999)
+    ).rejects.toThrow('Question not found.');
   });
 });
