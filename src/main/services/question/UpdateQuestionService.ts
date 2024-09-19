@@ -1,16 +1,20 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
-
 export class UpdateQuestionService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+    
     async updateQuestion(id: number, data: any) {
         try {
             if (data.image) {
                 data.image = Buffer.from(data.image, 'base64');
             }
 
-            const updatedQuestion = await prismaClient.question.update({
+            const updatedQuestion = await this.prismaClient.question.update({
                 where: { id },
                 data,
                 include: {

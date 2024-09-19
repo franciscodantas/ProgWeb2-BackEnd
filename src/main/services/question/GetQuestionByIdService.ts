@@ -1,11 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
-const prismaClient = new PrismaClient();
-
 export class GetQuestionByIdService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async getQuestionById(id: number) {
         try {
-            const question = await prismaClient.question.findUnique({
+            const question = await this.prismaClient.question.findUnique({
                 where: { id },
                 include: {
                     student: true,

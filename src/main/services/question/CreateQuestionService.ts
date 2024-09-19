@@ -1,9 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
-
 export class CreateQuestionService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
     async createQuestion(data: {
         title: string;
         content: string;
@@ -14,7 +17,7 @@ export class CreateQuestionService {
         disciplineId: number;
     }) {
         try {
-            const disciplineExists = await prismaClient.discipline.findUnique({
+            const disciplineExists = await this.prismaClient.discipline.findUnique({
                 where: { id: data.disciplineId },
             });
 
@@ -22,7 +25,7 @@ export class CreateQuestionService {
                 throw new Error("Discipline not found.");
             }
 
-            const existingQuestion = await prismaClient.question.findUnique({
+            const existingQuestion = await this.prismaClient.question.findUnique({
                 where: { title: data.title },
             });
 
@@ -31,14 +34,14 @@ export class CreateQuestionService {
             }
 
             if (data.studentId) {
-                const existingStudent = await prismaClient.student.findUnique({
+                const existingStudent = await this.prismaClient.student.findUnique({
                     where: { id: data.studentId },
                 });
                 if (!existingStudent) {
                     throw new Error("Author not found.");
                 }
             } else {
-                const existingProfessor = await prismaClient.professor.findUnique({
+                const existingProfessor = await this.prismaClient.professor.findUnique({
                     where: { id: data.professorId },
                 });
                 if (!existingProfessor) {
@@ -49,7 +52,7 @@ export class CreateQuestionService {
             const base64Image = data.image.trim();
             const imageBuffer = Buffer.from(base64Image, 'base64');
 
-            const question = await prismaClient.question.create({
+            const question = await this.prismaClient.question.create({
                 data: {
                     title: data.title,
                     content: data.content,
