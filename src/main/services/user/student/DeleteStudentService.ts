@@ -1,12 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
-
 export class DeleteStudentService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async deleteStudent(id: number) {
         try {
-            const deletedStudent = await prismaClient.student.delete({
+            const deletedStudent = await this.prismaClient.student.delete({
                 where: { id }
             });
             return deletedStudent;

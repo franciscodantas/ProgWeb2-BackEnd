@@ -2,9 +2,13 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { BcryptUtils } from '../../../utils/BcryptUtil';
 
-const prismaClient = new PrismaClient();
-
 export class UpdateStudentService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async updateStudent(id: number, data: {
         name: string;
         identityProviderId: string;
@@ -14,7 +18,7 @@ export class UpdateStudentService {
     }) {
         try {
             const hash = await BcryptUtils.hashPassword(data.password);
-            const updatedStudent = await prismaClient.student.update({
+            const updatedStudent = await this.prismaClient.student.update({
                 where: { id },
                 data: {
                     name: data.name,

@@ -1,12 +1,17 @@
 import { PrismaClient} from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
 
 export class DeleteAdmService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async delete(id: number) {
         try {
-            const deletedAdm = await prismaClient.adm.delete({
+            const deletedAdm = await this.prismaClient.adm.delete({
                 where: { id }
             });
             return deletedAdm;

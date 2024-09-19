@@ -1,9 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { BcryptUtils } from '../../../utils/BcryptUtil';
 
-const prismaClient = new PrismaClient();
-
 export class CreateStudentService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async createStudent(data: {
         id: number;
         name: string;
@@ -14,7 +18,7 @@ export class CreateStudentService {
     }) {
         try {
             const hash = await BcryptUtils.hashPassword(data.password);
-            const newStudent = await prismaClient.student.create({
+            const newStudent = await this.prismaClient.student.create({
                 data: {
                     id: data.id,
                     name: data.name,

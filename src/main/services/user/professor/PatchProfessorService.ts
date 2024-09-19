@@ -1,9 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
-
 export class PatchProfessorService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async patchProfessor(id: number, updates: {
         name?: string;
         identityProviderId?: string;
@@ -14,7 +18,7 @@ export class PatchProfessorService {
         try {
             const { disciplines, ...otherUpdates } = updates;
 
-            const updatedProfessor = await prismaClient.professor.update({
+            const updatedProfessor = await this.prismaClient.professor.update({
                 where: { id },
                 data: {
                     ...otherUpdates,

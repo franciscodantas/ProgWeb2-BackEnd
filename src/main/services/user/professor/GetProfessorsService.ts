@@ -1,12 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
-
 export class GetProfessorsService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+    
     async getAllProfessors() {
         try {
-            const professors = await prismaClient.professor.findMany({
+            const professors = await this.prismaClient.professor.findMany({
                 include: {
                     Question: true,
                     disciplines: true,

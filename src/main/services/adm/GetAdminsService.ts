@@ -1,12 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
-
 export class GetAdminsService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
     async getAdmins() {
         try {
-            const admins = await prismaClient.adm.findMany({});
+            const admins = await this.prismaClient.adm.findMany({});
             return admins;
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {

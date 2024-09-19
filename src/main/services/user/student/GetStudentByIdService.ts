@@ -4,15 +4,25 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 const prismaClient = new PrismaClient();
 
 export class GetStudentByIdService {
-    async getStudentById(id: number) {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
+    async getStudentById(id: any) {
         try {
-            const student = await prismaClient.student.findUnique({
+            const student = await this.prismaClient.student.findUnique({
                 where: { id },
                 include: {
                     Question: true,
                 },
             });
-
+    
+            if (!student) {
+                throw new Error("Student not found.");
+            }
+    
             return student;
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {

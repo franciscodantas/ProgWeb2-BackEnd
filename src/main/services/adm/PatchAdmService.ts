@@ -1,12 +1,17 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
 
 export class PatchAdmService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+    
     async patchAdm(id: number, updates: any) {
         try {
-            const updatedAdm = await prismaClient.adm.update({
+            const updatedAdm = await this.prismaClient.adm.update({
                 where: { id },
                 data: updates,
             });

@@ -2,13 +2,18 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { BcryptUtils } from '../../utils/BcryptUtil';
 
-const prismaClient = new PrismaClient();
 
 export class UpdateAdmService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async updateAdm(id: number, name: string, email: string, password: string) {
         try {
             const hash = await BcryptUtils.hashPassword(password);
-            const updatedAdm = await prismaClient.adm.update({
+            const updatedAdm = await this.prismaClient.adm.update({
                 where: { id },
                 data: { name, email, password: hash},
             });

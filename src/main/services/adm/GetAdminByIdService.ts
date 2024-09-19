@@ -1,12 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
-
 export class GetAdminByIdService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async getAdminById(id: number) {
         try {
-            const admin = await prismaClient.adm.findUnique({
+            const admin = await this.prismaClient.adm.findUnique({
                 where: { id }
             });
             return admin;

@@ -1,303 +1,300 @@
 import { PrismaClient } from '@prisma/client';
 import { CreateDisciplineService } from '../main/services/discipline/CreateDisciplineService';
-import { describe, expect, test, beforeAll, afterAll } from 'vitest';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { DeleteDisciplineService } from '../main/services/discipline/DeleteDisciplineService';
 import { GetAllDisciplineService } from '../main/services/discipline/GetAllDisciplineService';
 import { GetDisciplineByIdService } from '../main/services/discipline/GetDisciplineByIdService';
 import { PatchDisciplineService } from '../main/services/discipline/PatchDisciplineService';
 import { UpdateDisciplineService } from '../main/services/discipline/UpdateDisciplineService';
 
-const prismaClient = new PrismaClient();
-
-beforeAll(async () => {
-});
-
-afterAll(async () => {
-  await prismaClient.$disconnect();
+jest.mock('@prisma/client', () => {
+    return {
+        PrismaClient: jest.fn().mockImplementation(() => {
+            return {
+                discipline: {
+                  create: jest.fn(),
+                  delete: jest.fn(),
+                  findUnique: jest.fn(),
+                  findMany: jest.fn(),
+                  update: jest.fn(),
+                },
+            };
+        }),
+    };
 });
 
 describe('CreateDisciplineService', () => {
-  let createdDisciplineId: number;
-  const createDisciplineService = new CreateDisciplineService();
+    let createDisciplineService: CreateDisciplineService;
+    let prismaMock: PrismaClient;
 
-  afterAll(async () => {
-    if (createdDisciplineId) {
-      await prismaClient.discipline.delete({ where: { id: createdDisciplineId } });
-    }
-    await prismaClient.$disconnect();
-  });
+    beforeEach(() => {
+        prismaMock = new PrismaClient();
+        createDisciplineService = new CreateDisciplineService(prismaMock);
+    });
 
-  test('deve criar uma nova disciplina com sucesso', async () => {
-    const disciplineData = {
-      courseCode: 'CS101',
-      curriculumCode: 'CUR2024',
-      subjectCode: 'SUB123',
-      name: 'Introduction to Computer Science',
-      type: 'Core',
-    };
+    it('should create a new discipline successfully', async () => {
+        const disciplineData = {
+            courseCode: 'CS101',
+            curriculumCode: 'CUR2023',
+            subjectCode: 'SUB123',
+            name: 'Computer Science',
+            type: 'Core',
+        };
 
-    const newDiscipline = await createDisciplineService.createDiscipline(disciplineData);
+        const newDiscipline = { id: 1, ...disciplineData };
+        prismaMock.discipline.create = jest.fn().mockResolvedValue(newDiscipline);
 
-    expect(newDiscipline).toBeDefined();
-    expect(newDiscipline).toHaveProperty('id');
-    expect(newDiscipline).toHaveProperty('courseCode', disciplineData.courseCode);
-    expect(newDiscipline).toHaveProperty('curriculumCode', disciplineData.curriculumCode);
-    expect(newDiscipline).toHaveProperty('subjectCode', disciplineData.subjectCode);
-    expect(newDiscipline).toHaveProperty('name', disciplineData.name);
-    expect(newDiscipline).toHaveProperty('type', disciplineData.type);
+        const result = await createDisciplineService.createDiscipline(disciplineData);
 
-    createdDisciplineId = newDiscipline.id;
-  });
+        expect(prismaMock.discipline.create).toHaveBeenCalledWith({
+            data: disciplineData,
+        });
+        expect(result).toEqual(newDiscipline);
+    });
+
+    it('should handle errors when creating a discipline', async () => {
+        const error = new Error('Database error');
+        prismaMock.discipline.create = jest.fn().mockRejectedValue(error);
+
+        const result = await createDisciplineService.createDiscipline({
+            courseCode: 'CS101',
+            curriculumCode: 'CUR2023',
+            subjectCode: 'SUB123',
+            name: 'Computer Science',
+            type: 'Core',
+        });
+
+        expect(prismaMock.discipline.create).toHaveBeenCalled();
+        expect(result).toEqual(error);
+    });
 });
 
-
-
 describe('DeleteDisciplineService', () => {
-  let testDisciplineId: number;
-  const deleteDisciplineService = new DeleteDisciplineService();
+  let deleteDisciplineService: DeleteDisciplineService;
+  let prismaMock: PrismaClient;
 
-  beforeAll(async () => {
-    const createdDiscipline = await prismaClient.discipline.create({
-      data: {
-        courseCode: 'CS101',
-        curriculumCode: 'CUR2024',
-        subjectCode: 'SUB123',
-        name: 'Introduction to Computer Science',
-        type: 'Core',
-      },
-    });
-    testDisciplineId = createdDiscipline.id;
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      deleteDisciplineService = new DeleteDisciplineService(prismaMock);
   });
 
-  afterAll(async () => {
-    await prismaClient.$disconnect();
+  it('should delete a discipline successfully', async () => {
+      const id = 1;
+      const deletedDiscipline = { id, name: 'Computer Science' };
+      prismaMock.discipline.delete = jest.fn().mockResolvedValue(deletedDiscipline);
+
+      const result = await deleteDisciplineService.deleteDiscipline(id);
+
+      expect(prismaMock.discipline.delete).toHaveBeenCalledWith({
+          where: { id },
+      });
+      expect(result).toEqual(deletedDiscipline);
   });
 
-  test('deve excluir uma disciplina com sucesso', async () => {
-    const deletedDiscipline = await deleteDisciplineService.deleteDiscipline(testDisciplineId);
+  it('should throw an error when discipline not found', async () => {
+      const error = new PrismaClientKnownRequestError('Record not found.', {code: 'P2025', clientVersion: '1'});
+      prismaMock.discipline.delete = jest.fn().mockRejectedValue(error);
 
-    expect(deletedDiscipline).toBeDefined();
-    expect(deletedDiscipline).toHaveProperty('id', testDisciplineId);
-    expect(deletedDiscipline).toHaveProperty('courseCode', 'CS101');
-    expect(deletedDiscipline).toHaveProperty('curriculumCode', 'CUR2024');
-    expect(deletedDiscipline).toHaveProperty('subjectCode', 'SUB123');
-    expect(deletedDiscipline).toHaveProperty('name', 'Introduction to Computer Science');
-    expect(deletedDiscipline).toHaveProperty('type', 'Core');
+      await expect(deleteDisciplineService.deleteDiscipline(999)).rejects.toThrow('Discipline not found.');
   });
 
-  test('deve lançar um erro se a disciplina não for encontrada', async () => {
-    const nonExistentId = 9999999;
+  it('should rethrow unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.discipline.delete = jest.fn().mockRejectedValue(error);
 
-    await expect(deleteDisciplineService.deleteDiscipline(nonExistentId))
-      .rejects
-      .toThrow('Discipline not found.');
+      await expect(deleteDisciplineService.deleteDiscipline(1)).rejects.toThrow('Unexpected error');
   });
 });
 
 describe('GetAllDisciplineService', () => {
-    const getAllDisciplineService = new GetAllDisciplineService();
-    const testDisciplines = [
-        {
-        courseCode: 'CS101',
-        curriculumCode: 'CUR2024',
-        subjectCode: 'SUB123',
-        name: 'Introduction to Computer Science',
-        type: 'Core',
-        },
-        {
-        courseCode: 'CS102',
-        curriculumCode: 'CUR2024',
-        subjectCode: 'SUB124',
-        name: 'Data Structures',
-        type: 'Core',
-        },
-        {
-        courseCode: 'CS103',
-        curriculumCode: 'CUR2024',
-        subjectCode: 'SUB125',
-        name: 'Algorithms',
-        type: 'Core',
-        },
-    ];
+  let getAllDisciplineService: GetAllDisciplineService;
+  let prismaMock: PrismaClient;
 
-    beforeAll(async () => {
-        await prismaClient.discipline.createMany({
-        data: testDisciplines,
-        });
-    });
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      getAllDisciplineService = new GetAllDisciplineService(prismaMock);
+  });
 
-    afterAll(async () => {
-        await prismaClient.discipline.deleteMany({});
-        await prismaClient.$disconnect();
-    });
+  it('should return all disciplines with pagination', async () => {
+      const pageNumber = 1;
+      const limitNumber = 10;
+      const disciplines = [{ id: 1, name: 'Computer Science' }, { id: 2, name: 'Mathematics' }];
+      prismaMock.discipline.findMany = jest.fn().mockResolvedValue(disciplines);
 
-    test('deve obter todas as disciplinas sem paginação', async () => {
-        const disciplines = await getAllDisciplineService.getAll();
+      const result = await getAllDisciplineService.getAll(pageNumber, limitNumber);
 
-        expect(disciplines).toBeDefined();
-        expect(disciplines.length).toBe(testDisciplines.length);
-        expect(disciplines[0]).toHaveProperty('courseCode', 'CS101');
-        expect(disciplines[1]).toHaveProperty('courseCode', 'CS102');
-        expect(disciplines[2]).toHaveProperty('courseCode', 'CS103');
-    });
+      expect(prismaMock.discipline.findMany).toHaveBeenCalledWith({
+          skip: (pageNumber - 1) * limitNumber,
+          take: limitNumber,
+          include: {
+              questions: true,
+          },
+      });
+      expect(result).toEqual(disciplines);
+  });
 
-    test('deve obter disciplinas com paginação', async () => {
-        const pageNumber = 1;
-        const limitNumber = 2;
-        const disciplines = await getAllDisciplineService.getAll(pageNumber, limitNumber);
+  it('should return all disciplines without pagination', async () => {
+      const disciplines = [{ id: 1, name: 'Computer Science' }, { id: 2, name: 'Mathematics' }];
+      prismaMock.discipline.findMany = jest.fn().mockResolvedValue(disciplines);
 
-        expect(disciplines).toBeDefined();
-        expect(disciplines.length).toBe(limitNumber);
-        expect(disciplines[0]).toHaveProperty('courseCode', 'CS101');
-        expect(disciplines[1]).toHaveProperty('courseCode', 'CS102');
-    });
+      const result = await getAllDisciplineService.getAll(undefined, undefined);
+
+      expect(prismaMock.discipline.findMany).toHaveBeenCalledWith({
+          skip: 0,
+          take: undefined,
+          include: {
+              questions: true,
+          },
+      });
+      expect(result).toEqual(disciplines);
+  });
+
+  it('should handle errors when fetching disciplines', async () => {
+      const error = new PrismaClientKnownRequestError('Record not found.', {code: 'P2025', clientVersion: '1'});
+      prismaMock.discipline.findMany = jest.fn().mockRejectedValue(error);
+
+      await expect(getAllDisciplineService.getAll(1, 10)).rejects.toThrow('Discipline not found.');
+  });
+
+  it('should rethrow unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.discipline.findMany = jest.fn().mockRejectedValue(error);
+
+      await expect(getAllDisciplineService.getAll(1, 10)).rejects.toThrow('Unexpected error');
+  });
 });
 
 describe('GetDisciplineByIdService', () => {
-  let testDisciplineId: number;
-  const getDisciplineByIdService = new GetDisciplineByIdService();
+  let getDisciplineByIdService: GetDisciplineByIdService;
+  let prismaMock: PrismaClient;
 
-  beforeAll(async () => {
-    const createdDiscipline = await prismaClient.discipline.create({
-      data: {
-        courseCode: 'CS101',
-        curriculumCode: 'CUR2024',
-        subjectCode: 'SUB123',
-        name: 'Introduction to Computer Science',
-        type: 'Core',
-      },
-    });
-    testDisciplineId = createdDiscipline.id;
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      getDisciplineByIdService = new GetDisciplineByIdService(prismaMock);
   });
 
-  afterAll(async () => {
-    await prismaClient.discipline.deleteMany({});
-    await prismaClient.$disconnect();
+  it('should return a discipline by ID successfully', async () => {
+      const id = 1;
+      const discipline = { id, name: 'Computer Science', questions: [] };
+      prismaMock.discipline.findUnique = jest.fn().mockResolvedValue(discipline);
+
+      const result = await getDisciplineByIdService.getDisciplineById(id);
+
+      expect(prismaMock.discipline.findUnique).toHaveBeenCalledWith({
+          where: { id },
+          include: {
+              questions: true,
+          },
+      });
+      expect(result).toEqual(discipline);
   });
 
-  test('deve obter a disciplina pelo ID com sucesso', async () => {
-    const discipline = await getDisciplineByIdService.getDisciplineById(testDisciplineId);
+  it('should throw an error when discipline not found', async () => {
+      prismaMock.discipline.findUnique = jest.fn().mockResolvedValue(null);
 
-    expect(discipline).toBeDefined();
-    expect(discipline).toHaveProperty('id', testDisciplineId);
-    expect(discipline).toHaveProperty('courseCode', 'CS101');
-    expect(discipline).toHaveProperty('curriculumCode', 'CUR2024');
-    expect(discipline).toHaveProperty('subjectCode', 'SUB123');
-    expect(discipline).toHaveProperty('name', 'Introduction to Computer Science');
-    expect(discipline).toHaveProperty('type', 'Core');
+      await expect(getDisciplineByIdService.getDisciplineById(999)).rejects.toThrow('Discipline not found.');
   });
 
-  test('deve lançar um erro se a disciplina não for encontrada', async () => {
-    const nonExistentId = 9999999;
+  it('should handle unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.discipline.findUnique = jest.fn().mockRejectedValue(error);
 
-    await expect(getDisciplineByIdService.getDisciplineById(nonExistentId))
-      .rejects
-      .toThrow('Discipline not found.');
+      await expect(getDisciplineByIdService.getDisciplineById(1)).rejects.toThrow('Unexpected error');
   });
 });
 
 describe('PatchDisciplineService', () => {
-  let testDisciplineId: number;
-  const patchDisciplineService = new PatchDisciplineService();
+  let patchDisciplineService: PatchDisciplineService;
+  let prismaMock: PrismaClient;
 
-  beforeAll(async () => {
-    const createdDiscipline = await prismaClient.discipline.create({
-      data: {
-        courseCode: 'CS101',
-        curriculumCode: 'CUR2024',
-        subjectCode: 'SUB123',
-        name: 'Introduction to Computer Science',
-        type: 'Core',
-      },
-    });
-    testDisciplineId = createdDiscipline.id;
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      patchDisciplineService = new PatchDisciplineService(prismaMock);
   });
 
-  afterAll(async () => {
-    await prismaClient.discipline.deleteMany({});
-    await prismaClient.$disconnect();
+  it('should update a discipline successfully', async () => {
+      const id = 1;
+      const updates = { name: 'Updated Discipline' };
+      const updatedDiscipline = { id, ...updates };
+      prismaMock.discipline.update = jest.fn().mockResolvedValue(updatedDiscipline);
+
+      const result = await patchDisciplineService.patchDiscipline(id, updates);
+
+      expect(prismaMock.discipline.update).toHaveBeenCalledWith({
+          where: { id },
+          data: updates,
+      });
+      expect(result).toEqual(updatedDiscipline);
   });
 
-  test('deve atualizar uma disciplina com sucesso', async () => {
-    const updates = {
-      name: 'Advanced Computer Science',
-      type: 'Elective',
-    };
+  it('should throw an error when discipline not found', async () => {
+      const error = new PrismaClientKnownRequestError('Record not found.', {code: 'P2025', clientVersion: '1'});
+      prismaMock.discipline.update = jest.fn().mockRejectedValue(error);
 
-    const updatedDiscipline = await patchDisciplineService.patchDiscipline(testDisciplineId, updates);
-
-    expect(updatedDiscipline).toBeDefined();
-    expect(updatedDiscipline).toHaveProperty('id', testDisciplineId);
-    expect(updatedDiscipline).toHaveProperty('name', 'Advanced Computer Science');
-    expect(updatedDiscipline).toHaveProperty('type', 'Elective');
+      await expect(patchDisciplineService.patchDiscipline(999, { name: 'New Name' })).rejects.toThrow('Discipline not found.');
   });
 
-  test('deve lançar um erro se a disciplina não for encontrada', async () => {
-    const nonExistentId = 9999999;
-    const updates = {
-      name: 'Should Not Update',
-    };
+  it('should rethrow unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.discipline.update = jest.fn().mockRejectedValue(error);
 
-    await expect(patchDisciplineService.patchDiscipline(nonExistentId, updates))
-      .rejects
-      .toThrow('Discipline not found.');
+      await expect(patchDisciplineService.patchDiscipline(1, { name: 'New Name' })).rejects.toThrow('Unexpected error');
   });
 });
 
 describe('UpdateDisciplineService', () => {
-  let testDisciplineId: number;
-  const updateDisciplineService = new UpdateDisciplineService();
+  let updateDisciplineService: UpdateDisciplineService;
+  let prismaMock: PrismaClient;
 
-  beforeAll(async () => {
-    const createdDiscipline = await prismaClient.discipline.create({
-      data: {
-        courseCode: 'CS101',
-        curriculumCode: 'CUR2024',
-        subjectCode: 'SUB123',
-        name: 'Introduction to Computer Science',
-        type: 'Core',
-      },
-    });
-    testDisciplineId = createdDiscipline.id;
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      updateDisciplineService = new UpdateDisciplineService(prismaMock);
   });
 
-  afterAll(async () => {
-    await prismaClient.discipline.deleteMany({});
-    await prismaClient.$disconnect();
+  it('should update a discipline successfully', async () => {
+      const id = 1;
+      const data = {
+          courseCode: 'CS101',
+          curriculumCode: 'CUR2021',
+          subjectCode: 'SUB001',
+          name: 'Updated Discipline',
+          type: 'Core',
+      };
+      const updatedDiscipline = { id, ...data };
+      prismaMock.discipline.update = jest.fn().mockResolvedValue(updatedDiscipline);
+
+      const result = await updateDisciplineService.updateDiscipline(id, data);
+
+      expect(prismaMock.discipline.update).toHaveBeenCalledWith({
+          where: { id },
+          data,
+      });
+      expect(result).toEqual(updatedDiscipline);
   });
 
-  test('deve atualizar uma disciplina com sucesso', async () => {
-    const updates = {
-      courseCode: 'CS102',
-      curriculumCode: 'CUR2025',
-      subjectCode: 'SUB124',
-      name: 'Advanced Computer Science',
-      type: 'Elective',
-    };
+  it('should throw an error when discipline not found', async () => {
+      const error = new PrismaClientKnownRequestError('Record not found.', {code: 'P2025', clientVersion: '1'});
+      prismaMock.discipline.update = jest.fn().mockRejectedValue(error);
 
-    const updatedDiscipline = await updateDisciplineService.updateDiscipline(testDisciplineId, updates);
-
-    expect(updatedDiscipline).toBeDefined();
-    expect(updatedDiscipline).toHaveProperty('id', testDisciplineId);
-    expect(updatedDiscipline).toHaveProperty('courseCode', 'CS102');
-    expect(updatedDiscipline).toHaveProperty('curriculumCode', 'CUR2025');
-    expect(updatedDiscipline).toHaveProperty('subjectCode', 'SUB124');
-    expect(updatedDiscipline).toHaveProperty('name', 'Advanced Computer Science');
-    expect(updatedDiscipline).toHaveProperty('type', 'Elective');
+      await expect(updateDisciplineService.updateDiscipline(999, {
+          courseCode: 'CS101',
+          curriculumCode: 'CUR2021',
+          subjectCode: 'SUB001',
+          name: 'Updated Discipline',
+          type: 'Core',
+      })).rejects.toThrow('Discipline not found.');
   });
 
-  test('deve lançar um erro se a disciplina não for encontrada', async () => {
-    const nonExistentId = 9999999;
-    const updates = {
-      courseCode: 'CS103',
-      curriculumCode: 'CUR2026',
-      subjectCode: 'SUB125',
-      name: 'Data Structures',
-      type: 'Core',
-    };
+  it('should rethrow unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.discipline.update = jest.fn().mockRejectedValue(error);
 
-    await expect(updateDisciplineService.updateDiscipline(nonExistentId, updates))
-      .rejects
-      .toThrow('Discipline not found.');
+      await expect(updateDisciplineService.updateDiscipline(1, {
+          courseCode: 'CS101',
+          curriculumCode: 'CUR2021',
+          subjectCode: 'SUB001',
+          name: 'Updated Discipline',
+          type: 'Core',
+      })).rejects.toThrow('Unexpected error');
   });
 });

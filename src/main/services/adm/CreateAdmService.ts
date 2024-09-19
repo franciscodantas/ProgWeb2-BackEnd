@@ -1,13 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 import { BcryptUtils } from '../../utils/BcryptUtil';
 
-const prismaClient = new PrismaClient();
 
 export class CreateAdmService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async createAdm(name: any, email: any, password: any) {
         try {
             const hash = await BcryptUtils.hashPassword(password);
-            const newAdm = await prismaClient.adm.create({
+            const newAdm = await this.prismaClient.adm.create({
                 data: {
                     name,
                     email,

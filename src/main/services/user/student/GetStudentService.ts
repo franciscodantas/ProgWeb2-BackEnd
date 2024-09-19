@@ -1,11 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
-const prismaClient = new PrismaClient();
-
 export class GetStudentService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async getAllStudent() {
         try {
-            const students = await prismaClient.student.findMany({
+            const students = await this.prismaClient.student.findMany({
                 include: {
                     Question: true,
                 },

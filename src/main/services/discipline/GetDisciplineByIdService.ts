@@ -1,12 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-const prismaClient = new PrismaClient();
-
 export class GetDisciplineByIdService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async getDisciplineById(id: number) {
         try {
-            const discipline = await prismaClient.discipline.findUnique({
+            const discipline = await this.prismaClient.discipline.findUnique({
                 where: { id },
                 include: {
                     questions: true

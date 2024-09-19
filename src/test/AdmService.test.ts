@@ -1,268 +1,271 @@
-import { describe, expect, test, beforeAll, afterAll } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { CreateAdmService } from '../main/services/adm/CreateAdmService';
 import { BcryptUtils } from '../main/utils/BcryptUtil';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { DeleteAdmService } from '../main/services/adm/DeleteAdmService';
 import { GetAdminByIdService } from '../main/services/adm/GetAdminByIdService';
 import { GetAdminsService } from '../main/services/adm/GetAdminsService';
 import { PatchAdmService } from '../main/services/adm/PatchAdmService';
 import { UpdateAdmService } from '../main/services/adm/UpdateAdmService';
 
-const prismaClient = new PrismaClient();
-
-beforeAll(async () => {
+jest.mock('@prisma/client', () => {
+    return {
+        PrismaClient: jest.fn().mockImplementation(() => {
+            return {
+                adm: {
+                    create: jest.fn(),
+                    delete: jest.fn(),
+                    findUnique: jest.fn(),
+                    findMany: jest.fn(),
+                    update: jest.fn(),
+                },
+            };
+        }),
+    };
 });
 
-afterAll(async () => {
-  await prismaClient.$disconnect();
+jest.mock('../main/utils/BcryptUtil', () => {
+    return {
+        BcryptUtils: {
+            hashPassword: jest.fn(),
+        },
+    };
 });
 
 describe('CreateAdmService', () => {
-  const createAdmService = new CreateAdmService();
+    let createAdmService: CreateAdmService;
+    let prismaMock: PrismaClient;
 
-  test('deve criar um novo administrador com sucesso', async () => {
-    const name = 'Admin Test';
-    const email = 'admin@test.com';
-    const password = 'securepassword123';
+    beforeEach(() => {
+        prismaMock = new PrismaClient();
+        createAdmService = new CreateAdmService(prismaMock);
+    });
 
-    const newAdm = await createAdmService.createAdm(name, email, password);
+    it('should create a new admin successfully', async () => {
+        const hashedPassword = 'hashedPassword123';
+        (BcryptUtils.hashPassword as jest.Mock).mockResolvedValue(hashedPassword);
 
-    expect(newAdm).toHaveProperty('id');
-    expect(newAdm.name).toBe(name);
-    expect(newAdm.email).toBe(email);
+        const adminData = { id: 1, name: 'John Doe', email: 'john@example.com', password: hashedPassword };
+        prismaMock.adm.create = jest.fn().mockResolvedValue(adminData);
 
-    const isPasswordValid = await BcryptUtils.comparePassword(password, newAdm.password);
-    expect(isPasswordValid).toBe(true);
-  });
+        const result = await createAdmService.createAdm('John Doe', 'john@example.com', 'password123');
+
+        expect(BcryptUtils.hashPassword).toHaveBeenCalledWith('password123');
+        expect(prismaMock.adm.create).toHaveBeenCalledWith({
+            data: {
+                name: 'John Doe',
+                email: 'john@example.com',
+                password: hashedPassword,
+            },
+        });
+        expect(result).toEqual(adminData);
+    });
 });
 
 describe('DeleteAdmService', () => {
+  let deleteAdmService: DeleteAdmService;
+  let prismaMock: PrismaClient;
 
-  const deleteAdmService = new DeleteAdmService();
-  let testAdminId: number;
-
-  beforeAll(async () => {
-    const createdAdm = await prismaClient.adm.create({
-      data: {
-        name: 'Test Admin',
-        email: 'testadmin@example.com',
-        password: 'hashedpassword'
-      }
-    });
-    testAdminId = createdAdm.id;
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      deleteAdmService = new DeleteAdmService(prismaMock);
   });
 
-  afterAll(async () => {
-    await prismaClient.$disconnect();
+  it('should delete an admin successfully', async () => {
+      const deletedAdm = { id: 1, name: 'John Doe', email: 'john@example.com' };
+      prismaMock.adm.delete = jest.fn().mockResolvedValue(deletedAdm);
+
+      const result = await deleteAdmService.delete(1);
+
+      expect(prismaMock.adm.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(result).toEqual(deletedAdm);
   });
 
-  test('deve deletar um administrador com sucesso', async () => {
-    const result = await deleteAdmService.delete(testAdminId);
-    expect(result).toHaveProperty('id');
-    expect(result.id).toBe(testAdminId);
+  it('should throw an error when admin not found', async () => {
+      const error = new PrismaClientKnownRequestError('Record not found.', {code: 'P2025', clientVersion: '1'});
+      prismaMock.adm.delete = jest.fn().mockRejectedValue(error);
+
+      await expect(deleteAdmService.delete(999)).rejects.toThrow('Adm not found.');
   });
 
-  test('deve lançar um erro se o administrador não for encontrado', async () => {
-    const nonExistentId = 9999999;
+  it('should rethrow unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.adm.delete = jest.fn().mockRejectedValue(error);
 
-    try {
-      await deleteAdmService.delete(nonExistentId);
-    } catch (error) {
-      expect(error).toBeInstanceOf(Error);
-      expect(error.message).toBe('Adm not found.');
-    }
+      await expect(deleteAdmService.delete(1)).rejects.toThrow('Unexpected error');
   });
 });
 
 describe('GetAdminByIdService', () => {
-  const getAdminByIdService = new GetAdminByIdService();
-  let testAdminId: number;
+  let getAdminByIdService: GetAdminByIdService;
+  let prismaMock: PrismaClient;
 
-  beforeAll(async () => {
-    const createdAdm = await prismaClient.adm.create({
-      data: {
-        name: 'Test Admin',
-        email: 'testadmin@example.com',
-        password: 'hashedpassword'
-      }
-    });
-    testAdminId = createdAdm.id;
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      getAdminByIdService = new GetAdminByIdService(prismaMock);
   });
 
-  afterAll(async () => {
-    await prismaClient.adm.delete({ where: { id: testAdminId } });
-    await prismaClient.$disconnect();
+  it('should return admin when found', async () => {
+      const adminData = { id: 1, name: 'John Doe', email: 'john@example.com' };
+      prismaMock.adm.findUnique = jest.fn().mockResolvedValue(adminData);
+
+      const result = await getAdminByIdService.getAdminById(1);
+
+      expect(prismaMock.adm.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(result).toEqual(adminData);
   });
 
-  test('deve obter um administrador por ID com sucesso', async () => {
-    const admin = await getAdminByIdService.getAdminById(testAdminId);
-    expect(admin).toBeDefined();
-    expect(admin).toHaveProperty('id', testAdminId);
-    expect(admin).toHaveProperty('name', 'Test Admin');
-    expect(admin).toHaveProperty('email', 'testadmin@example.com');
+  it('should return null when admin not found', async () => {
+      prismaMock.adm.findUnique = jest.fn().mockResolvedValue(null);
+
+      const result = await getAdminByIdService.getAdminById(999);
+
+      expect(prismaMock.adm.findUnique).toHaveBeenCalledWith({ where: { id: 999 } });
+      expect(result).toBeNull();
   });
 
-  test('deve retornar null se o administrador não for encontrado', async () => {
-    const nonExistentId = 9999999;
-    const admin = await getAdminByIdService.getAdminById(nonExistentId);
-    expect(admin).toBeNull();
+  it('should throw an error when there is a database error', async () => {
+      const error = new PrismaClientKnownRequestError('Database error.', {code: 'P2000', clientVersion: '1'});
+      prismaMock.adm.findUnique = jest.fn().mockRejectedValue(error);
+
+      await expect(getAdminByIdService.getAdminById(1)).rejects.toThrow('Adm not found.');
+  });
+
+  it('should rethrow unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.adm.findUnique = jest.fn().mockRejectedValue(error);
+
+      await expect(getAdminByIdService.getAdminById(1)).rejects.toThrow('Unexpected error');
   });
 });
 
 describe('GetAdminsService', () => {
-  const getAdminsService = new GetAdminsService();
-  let testAdminId: number;
+  let getAdminsService: GetAdminsService;
+  let prismaMock: PrismaClient;
 
-  beforeAll(async () => {
-    const createdAdm = await prismaClient.adm.create({
-      data: {
-        name: 'Test Admin',
-        email: 'testadmin@example.com',
-        password: 'hashedpassword'
-      }
-    });
-    testAdminId = createdAdm.id;
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      getAdminsService = new GetAdminsService(prismaMock);
   });
 
-  afterAll(async () => {
-    const admin = await prismaClient.adm.findUnique({ where: { id: testAdminId } });
-    if (admin) {
-      await prismaClient.adm.delete({ where: { id: testAdminId } });
-    }
-    await prismaClient.$disconnect();
+  it('should return a list of admins', async () => {
+      const adminData = [
+          { id: 1, name: 'John Doe', email: 'john@example.com' },
+          { id: 2, name: 'Jane Doe', email: 'jane@example.com' }
+      ];
+      prismaMock.adm.findMany = jest.fn().mockResolvedValue(adminData);
+
+      const result = await getAdminsService.getAdmins();
+
+      expect(prismaMock.adm.findMany).toHaveBeenCalledWith({});
+      expect(result).toEqual(adminData);
   });
 
-  test('deve obter uma lista de administradores com sucesso', async () => {
-    const admins = await getAdminsService.getAdmins();
-    expect(admins).toBeDefined();
-    expect(admins.length).toBeGreaterThan(0);
-  
-    const admin = admins.find(a => a.id === testAdminId);
-    expect(admin).toBeDefined();
-    expect(admin).toHaveProperty('id', testAdminId);
-    expect(admin).toHaveProperty('name', 'Test Admin');
-    expect(admin).toHaveProperty('email', 'testadmin@example.com');
+  it('should return an empty list when no admins are found', async () => {
+      prismaMock.adm.findMany = jest.fn().mockResolvedValue([]);
+
+      const result = await getAdminsService.getAdmins();
+
+      expect(prismaMock.adm.findMany).toHaveBeenCalledWith({});
+      expect(result).toEqual([]);
   });
 
-  test('deve retornar uma lista vazia se não houver administradores', async () => {
-    await prismaClient.adm.deleteMany({});
+  it('should rethrow unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.adm.findMany = jest.fn().mockRejectedValue(error);
 
-    const admins = await getAdminsService.getAdmins();
-    expect(admins).toEqual([]);
+      await expect(getAdminsService.getAdmins()).rejects.toThrow('Unexpected error');
   });
 });
 
 describe('PatchAdmService', () => {
-  let testAdminId: number;
-  const patchAdmService = new PatchAdmService();
+  let patchAdmService: PatchAdmService;
+  let prismaMock: PrismaClient;
 
-  beforeAll(async () => {
-    const createdAdm = await prismaClient.adm.create({
-      data: {
-        name: 'Test Admin',
-        email: 'testadmin@example.com',
-        password: 'hashedpassword'
-      }
-    });
-    testAdminId = createdAdm.id;
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      patchAdmService = new PatchAdmService(prismaMock);
   });
 
-  afterAll(async () => {
-    await prismaClient.adm.delete({ where: { id: testAdminId } });
-    await prismaClient.$disconnect();
+  it('should update an admin successfully', async () => {
+      const updates = { name: 'John Smith', email: 'john.smith@example.com' };
+      const updatedAdm = { id: 1, ...updates };
+      prismaMock.adm.update = jest.fn().mockResolvedValue(updatedAdm);
+
+      const result = await patchAdmService.patchAdm(1, updates);
+
+      expect(prismaMock.adm.update).toHaveBeenCalledWith({
+          where: { id: 1 },
+          data: updates,
+      });
+      expect(result).toEqual(updatedAdm);
   });
 
-  test('deve atualizar um administrador com sucesso', async () => {
-    const updates = { name: 'Updated Admin', email: 'updatedadmin@example.com' };
-    const updatedAdmin = await patchAdmService.patchAdm(testAdminId, updates);
+  it('should throw an error when admin not found', async () => {
+      const error = new PrismaClientKnownRequestError('Record not found.', {code: 'P2025', clientVersion: '1'});
+      prismaMock.adm.update = jest.fn().mockRejectedValue(error);
 
-    expect(updatedAdmin).toBeDefined();
-    expect(updatedAdmin).toHaveProperty('id', testAdminId);
-    expect(updatedAdmin).toHaveProperty('name', 'Updated Admin');
-    expect(updatedAdmin).toHaveProperty('email', 'updatedadmin@example.com');
+      await expect(patchAdmService.patchAdm(999, { name: 'New Name' })).rejects.toThrow('Adm not found.');
   });
 
-  test('deve lançar um erro quando o administrador não for encontrado', async () => {
-    const nonExistentId = 9999999;
-    const updates = { name: 'Should Not Exist' };
+  it('should rethrow unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.adm.update = jest.fn().mockRejectedValue(error);
 
-    await expect(patchAdmService.patchAdm(nonExistentId, updates))
-      .rejects
-      .toThrowError('Adm not found.');
-  });
-
-  test('deve manter os campos não atualizados inalterados', async () => {
-    const updates = { name: 'Partially Updated Admin' };
-    const partiallyUpdatedAdmin = await patchAdmService.patchAdm(testAdminId, updates);
-
-    expect(partiallyUpdatedAdmin).toBeDefined();
-    expect(partiallyUpdatedAdmin).toHaveProperty('id', testAdminId);
-    expect(partiallyUpdatedAdmin).toHaveProperty('name', 'Partially Updated Admin');
-    expect(partiallyUpdatedAdmin).toHaveProperty('email', 'updatedadmin@example.com');
+      await expect(patchAdmService.patchAdm(1, { name: 'New Name' })).rejects.toThrow('Unexpected error');
   });
 });
 
+jest.mock('../main/utils/BcryptUtil', () => {
+  return {
+      BcryptUtils: {
+          hashPassword: jest.fn(),
+      },
+  };
+});
+
 describe('UpdateAdmService', () => {
-  let testAdminId: number;
-  let initialPassword: string;
-  const updateAdmService = new UpdateAdmService();
+  let updateAdmService: UpdateAdmService;
+  let prismaMock: PrismaClient;
 
-  beforeAll(async () => {
-    initialPassword = 'initialpassword';
-    const createdAdm = await prismaClient.adm.create({
-      data: {
-        name: 'Test Admin',
-        email: 'testadmin@example.com',
-        password: await BcryptUtils.hashPassword(initialPassword),
-      }
-    });
-    testAdminId = createdAdm.id;
+  beforeEach(() => {
+      prismaMock = new PrismaClient();
+      updateAdmService = new UpdateAdmService(prismaMock);
   });
 
-  afterAll(async () => {
-    await prismaClient.adm.delete({ where: { id: testAdminId } });
-    await prismaClient.$disconnect();
+  it('should update an admin successfully', async () => {
+      const id = 1;
+      const name = 'John Doe';
+      const email = 'john@example.com';
+      const password = 'password123';
+      const hashedPassword = 'hashedPassword123';
+
+      (BcryptUtils.hashPassword as jest.Mock).mockResolvedValue(hashedPassword);
+      
+      const updatedAdm = { id, name, email, password: hashedPassword };
+      prismaMock.adm.update = jest.fn().mockResolvedValue(updatedAdm);
+
+      const result = await updateAdmService.updateAdm(id, name, email, password);
+
+      expect(BcryptUtils.hashPassword).toHaveBeenCalledWith(password);
+      expect(prismaMock.adm.update).toHaveBeenCalledWith({
+          where: { id },
+          data: { name, email, password: hashedPassword },
+      });
+      expect(result).toEqual(updatedAdm);
   });
 
-  test('deve atualizar um administrador com sucesso', async () => {
-    const newName = 'Updated Admin';
-    const newEmail = 'updatedadmin@example.com';
-    const newPassword = 'newpassword';
+  it('should throw an error when admin not found', async () => {
+      const error = new PrismaClientKnownRequestError('Record not found.', {code: 'P2025', clientVersion: '1'});
+      prismaMock.adm.update = jest.fn().mockRejectedValue(error);
 
-    const updatedAdmin = await updateAdmService.updateAdm(testAdminId, newName, newEmail, newPassword);
-
-    expect(updatedAdmin).toBeDefined();
-    expect(updatedAdmin).toHaveProperty('id', testAdminId);
-    expect(updatedAdmin).toHaveProperty('name', newName);
-    expect(updatedAdmin).toHaveProperty('email', newEmail);
-
-    const passwordMatches = await BcryptUtils.comparePassword(newPassword, updatedAdmin.password);
-    expect(passwordMatches).toBe(true);
+      await expect(updateAdmService.updateAdm(999, 'New Name', 'new@example.com', 'newPassword')).rejects.toThrow('Adm not found.');
   });
 
-  test('deve lançar um erro quando o administrador não for encontrado', async () => {
-    const nonExistentId = 9999999;
-    const newName = 'Non Existent Admin';
-    const newEmail = 'nonexistentadmin@example.com';
-    const newPassword = 'password';
+  it('should rethrow unexpected errors', async () => {
+      const error = new Error('Unexpected error');
+      prismaMock.adm.update = jest.fn().mockRejectedValue(error);
 
-    await expect(updateAdmService.updateAdm(nonExistentId, newName, newEmail, newPassword))
-      .rejects
-      .toThrowError('Adm not found.');
-  });
-
-  test('deve atualizar apenas os campos fornecidos', async () => {
-    const newName = 'Partially Updated Admin';
-    const newEmail = 'partiallyupdated@example.com';
-
-    const updatedAdmin = await updateAdmService.updateAdm(testAdminId, newName, newEmail, initialPassword);
-
-    expect(updatedAdmin).toBeDefined();
-    expect(updatedAdmin).toHaveProperty('id', testAdminId);
-    expect(updatedAdmin).toHaveProperty('name', newName);
-    expect(updatedAdmin).toHaveProperty('email', newEmail);
-
-    const passwordMatches = await BcryptUtils.comparePassword(initialPassword, updatedAdmin.password);
-    expect(passwordMatches).toBe(true);
+      await expect(updateAdmService.updateAdm(1, 'New Name', 'new@example.com', 'newPassword')).rejects.toThrow('Unexpected error');
   });
 });

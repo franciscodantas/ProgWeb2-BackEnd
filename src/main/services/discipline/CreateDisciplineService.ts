@@ -1,8 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 
-const prismaClient = new PrismaClient();
-
 export class CreateDisciplineService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
     async createDiscipline(data: {
         courseCode: string;
         curriculumCode: string;
@@ -11,7 +14,7 @@ export class CreateDisciplineService {
         type: string;
     }) {
         try {
-            const newDiscipline = await prismaClient.discipline.create({
+            const newDiscipline = await this.prismaClient.discipline.create({
                 data: {
                     courseCode: data.courseCode,
                     curriculumCode: data.curriculumCode,
