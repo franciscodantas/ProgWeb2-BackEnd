@@ -16,20 +16,25 @@ interface UserPayload {
     role: string;
 }
 
-const prismaClient = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
 export class AuthService {
+    private prismaClient: PrismaClient;
+
+    constructor(prismaClient?: PrismaClient) {
+        this.prismaClient = prismaClient || new PrismaClient();
+    }
+
     async login(email: any, password: string, userType: 'Professor' | 'Student' | 'Adm') {
         try {
             let user;
 
             if (userType === 'Professor') {
-                user = await prismaClient.professor.findUnique({where: {email}});
+                user = await this.prismaClient.professor.findUnique({where: {email}});
             } else if (userType === 'Student') {
-                user = await prismaClient.student.findUnique({ where: { email } });
+                user = await this.prismaClient.student.findUnique({ where: { email } });
             } else if (userType === 'Adm') {
-                user = await prismaClient.adm.findUnique({ where: { email } });
+                user = await this.prismaClient.adm.findUnique({ where: { email } });
             }
 
             if (!user) {
