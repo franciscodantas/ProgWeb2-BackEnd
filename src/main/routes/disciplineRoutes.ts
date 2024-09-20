@@ -19,9 +19,9 @@ const deleteDisciplineController = new DeleteDisciplineController();
 disciplineRoutes.get('/api/disciplines', getAllDisciplinesController.handle);
 disciplineRoutes.get('/api/disciplines/:id', getDisciplineByIdController.handle);
 disciplineRoutes.post('/api/disciplines', authenticateToken, authorizeRoles('Adm'), createDisciplineController.handle);
-disciplineRoutes.patch('/api/disciplines/:id', patchDisciplineController.handle);
-disciplineRoutes.delete('/api/disciplines/:id', deleteDisciplineController.handle);
-disciplineRoutes.put('/api/disciplines/:id', updateDisciplineController.handle);
+disciplineRoutes.patch('/api/disciplines/:id', authenticateToken, authorizeRoles('Adm'), patchDisciplineController.handle);
+disciplineRoutes.delete('/api/disciplines/:id', authenticateToken, authorizeRoles('Adm'), deleteDisciplineController.handle);
+disciplineRoutes.put('/api/disciplines/:id', authenticateToken, authorizeRoles('Adm'), updateDisciplineController.handle);
 
 
 export { disciplineRoutes };

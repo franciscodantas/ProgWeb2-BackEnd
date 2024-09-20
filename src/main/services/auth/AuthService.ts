@@ -55,7 +55,6 @@ export class AuthService {
         }
     }
 
-    // Função para gerar o token JWT
     private generateToken(userId: number, role: string) {
         return jwt.sign({ id: userId, role }, JWT_SECRET, {
             expiresIn: '1h',
@@ -99,4 +98,51 @@ export const authorizeSelfUpdate = () => {
         }
         next();
     };
+};
+
+export const authorizeAuthorOrAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as UserPayload;
+    const questionId = req.params.id;
+    const prisma = new PrismaClient();
+
+    if (user.role === 'Adm') {
+        return next();
+    }
+
+    try {
+        const question = await prisma.question.findUnique({
+            where: { id: Number(questionId) },
+            select: { studentId: true, professorId: true },
+        });
+
+        if (!question) {
+            return res.sendStatus(404);
+        }
+
+        const userId = Number(user.id);
+
+        if ((question.studentId != null && question.studentId == userId) ||
+            (question.professorId != null && question.professorId == userId)) {
+            return next();
+        }
+
+        return res.sendStatus(403);
+    } catch (error) {
+        console.error('Error fetching question:', error);
+        return res.sendStatus(500);
+    }
+};
+
+export const authorizeQuestionCreation = (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as UserPayload;
+    const { studentId, professorId } = req.body;
+
+    if (
+        (studentId && Number(studentId) == Number(user.id)) ||
+        (professorId && Number(professorId) == Number(user.id))
+    ) {
+        return next();
+    }
+
+    return res.sendStatus(403);
 };

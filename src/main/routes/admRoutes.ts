@@ -18,7 +18,7 @@ const deleteAdmController = new DeleteAdmController();
 
 admRoutes.get('/api/admins', authenticateToken, authorizeRoles('Adm'),  getAdminsController.handle);
 admRoutes.get('/api/admins/:id', authenticateToken, authorizeRoles('Adm'), getAdminByIdController.handle)
-admRoutes.post('/api/admins',authenticateToken, authorizeRoles('Adm'), createAdmController.handle);
+admRoutes.post('/api/admins',authenticateToken, createAdmController.handle);
 admRoutes.put('/api/admins/:id',authenticateToken, authorizeSelfUpdate(), updateAdmController.handle);
 admRoutes.patch('/api/admins/:id',authenticateToken, authorizeSelfUpdate(), patchAdmController.handle);
 admRoutes.delete('/api/admins/:id', authenticateToken, authorizeRoles('Adm'),deleteAdmController.handle);
