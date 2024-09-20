@@ -98,6 +98,22 @@ describe('CreateQuestionService', () => {
 
         await expect(createQuestionService.createQuestion(questionData)).rejects.toThrow("Author not found.");
     });
+
+    it('should throw an error if the student is not found when studentId is provided', async () => {
+        const questionDataWithStudentId = { ...questionData, studentId: 1 };
+        prismaMock.discipline.findUnique = jest.fn().mockResolvedValue({ id: disciplineId });
+        prismaMock.question.findUnique = jest.fn().mockResolvedValue(null);
+        prismaMock.student.findUnique = jest.fn().mockResolvedValue(null);
+
+        await expect(createQuestionService.createQuestion(questionDataWithStudentId)).rejects.toThrow("Author not found.");
+    });
+    
+    it('should throw an error if neither studentId nor professorId is provided', async () => {
+        const questionDataWithoutAuthor = { ...questionData, studentId: undefined, professorId: undefined };
+        prismaMock.discipline.findUnique = jest.fn().mockResolvedValue({ id: disciplineId });
+
+        await expect(createQuestionService.createQuestion(questionDataWithoutAuthor)).rejects.toThrow("Author not found.");
+    });
 });
 describe('DeleteQuestionService', () => {
     let deleteQuestionService: DeleteQuestionService;

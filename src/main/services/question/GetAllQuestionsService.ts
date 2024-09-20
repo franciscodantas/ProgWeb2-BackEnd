@@ -25,9 +25,6 @@ export class GetAllQuestionsService {
             });
             return questions;
         } catch (error) {
-            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
-                throw new Error("Questions not found.");
-            }
             console.error('Error fetching questions:', error);
             throw error;
         }
