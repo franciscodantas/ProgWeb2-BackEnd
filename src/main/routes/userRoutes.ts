@@ -11,7 +11,7 @@ import { CreateProfessorController } from '../controllers/users/professor/Create
 import { DeleteProfessorController } from '../controllers/users/professor/DeleteProfessorController';
 import { UpdateProfessorController } from '../controllers/users/professor/UpdateProfessorController';
 import { PatchProfessorController } from '../controllers/users/professor/PatchProfessorController';
-import { authenticateToken, authorizeRoles } from '../services/auth/AuthService';
+import { authenticateToken, authorizeRoles, authorizeSelfUpdate } from '../services/auth/AuthService';
 
 const userRoutes = Router();
 
@@ -30,18 +30,18 @@ const deleteProfessorController = new DeleteProfessorController();
 const createProfessorController = new CreateProfessorController();
 
 
-userRoutes.get('/api/users/students', authenticateToken, authorizeRoles('Admin'), getStudentsController.handle);
+userRoutes.get('/api/users/students', authenticateToken, authorizeRoles('Adm'), getStudentsController.handle);
 userRoutes.get('/api/users/students/:id', getStudentsByIdController.handle);
 userRoutes.post('/api/users/students', createStudentController.handle);
-userRoutes.put('/api/users/students/:id', updateStudentController.handle);
-userRoutes.patch('/api/users/students/:id', patchStudentController.handle);
+userRoutes.put('/api/users/students/:id', authenticateToken, authorizeSelfUpdate(), updateStudentController.handle);
+userRoutes.patch('/api/users/students/:id', authenticateToken, authorizeSelfUpdate(), patchStudentController.handle);
 userRoutes.delete('/api/users/students/:id', deleteStudentController.handle);
 
-userRoutes.get('/api/users/professors', authenticateToken, authorizeRoles('Admin'), getProfessorsController.handle);
+userRoutes.get('/api/users/professors', authenticateToken, authorizeRoles('Adm'), getProfessorsController.handle);
 userRoutes.get('/api/users/professors/:id', getProfessorByIdController.handle);
-userRoutes.post('/api/users/professors/', authenticateToken, authorizeRoles('Admin'), createProfessorController.handle);
-userRoutes.put('/api/users/professors/:id', updateProfessorController.handle);
-userRoutes.patch('/api/users/professors/:id', patchProfessorController.handle);
+userRoutes.post('/api/users/professors/', authenticateToken, authorizeRoles('Adm'), createProfessorController.handle);
+userRoutes.put('/api/users/professors/:id', authenticateToken, authorizeSelfUpdate(), updateProfessorController.handle);
+userRoutes.patch('/api/users/professors/:id',authenticateToken, authorizeSelfUpdate(), patchProfessorController.handle);
 userRoutes.delete('/api/users/professors/:id', deleteProfessorController.handle);
 
 export { userRoutes };

@@ -16,6 +16,7 @@ export class PatchProfessorService {
         disciplines?: number[];
     }) {
         try {
+            console.log(id)
             const { disciplines, ...otherUpdates } = updates;
 
             const updatedProfessor = await this.prismaClient.professor.update({
@@ -35,6 +36,7 @@ export class PatchProfessorService {
 
             return updatedProfessor;
         } catch (error) {
+            console.log(error)
             if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new Error("Professor not found.");
             }

@@ -12,6 +12,7 @@ declare global {
 }
 
 interface UserPayload {
+    id: string;
     email: string;
     role: string;
 }
@@ -78,7 +79,22 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 export const authorizeRoles = (...allowedRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const user = req.user as UserPayload;
+        console.log(user)
         if (!user || !allowedRoles.includes(user.role)) {
+            return res.sendStatus(403);
+        }
+        next();
+    };
+};
+
+export const authorizeSelfUpdate = () => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const user = req.user as UserPayload;
+        const userIdFromParams = req.params.id;
+        console.log(user)
+        console.log(userIdFromParams)
+        console.log(!user || user.id != userIdFromParams)
+        if (!user || user.id != userIdFromParams) {
             return res.sendStatus(403);
         }
         next();
