@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
-import { authenticateToken, authorizeRoles, AuthService } from '../main/services/auth/AuthService';
+import { authenticateToken, authorizeAuthorOrAdmin, authorizeQuestionCreation, authorizeRoles, authorizeSelfUpdate, AuthService } from '../main/services/auth/AuthService';
 import { BcryptUtils } from '../main/utils/BcryptUtil';
 
 jest.mock('@prisma/client', () => {
@@ -15,6 +15,10 @@ jest.mock('@prisma/client', () => {
                 },
                 adm: {
                     findUnique: jest.fn(),
+                },
+                question: {
+                    findUnique: jest.fn(),
+                    create: jest.fn(),
                 },
             };
         }),
@@ -94,6 +98,12 @@ describe('AuthService', () => {
 });
 
 describe('Middleware functions', () => {
+    let prisma: PrismaClient;
+
+    beforeEach(() => {
+        prisma = new PrismaClient();
+    });
+
     it('should authenticate token successfully', () => {
         const req = { headers: { authorization: 'Bearer fakeToken' } };
         const res = { sendStatus: jest.fn() };
@@ -153,5 +163,119 @@ describe('Middleware functions', () => {
 
         expect(res.sendStatus).toHaveBeenCalledWith(403);
         expect(next).not.toHaveBeenCalled();
+    });
+    describe('authorizeSelfUpdate', () => {
+        it('should allow user to update their own information', () => {
+            const req = { user: { id: '1' }, params: { id: '1' } };
+            const res = { sendStatus: jest.fn() };
+            const next = jest.fn();
+
+            authorizeSelfUpdate()(req as any, res as any, next);
+
+            expect(next).toHaveBeenCalled();
+        });
+
+        it('should return 403 if user tries to update another user', () => {
+            const req = { user: { id: '1' }, params: { id: '2' } };
+            const res = { sendStatus: jest.fn() };
+            const next = jest.fn();
+
+            authorizeSelfUpdate()(req as any, res as any, next);
+
+            expect(res.sendStatus).toHaveBeenCalledWith(403);
+            expect(next).not.toHaveBeenCalled();
+        });
+
+        it('should return 403 if user is not authenticated', () => {
+            const req = { user: null, params: { id: '1' } };
+            const res = { sendStatus: jest.fn() };
+            const next = jest.fn();
+
+            authorizeSelfUpdate()(req as any, res as any, next);
+
+            expect(res.sendStatus).toHaveBeenCalledWith(403);
+            expect(next).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('authorizeAuthorOrAdmin', () => {
+        it('should allow admin to proceed', async () => {
+            const req = { user: { role: 'Adm' }, params: { id: '1' } };
+            const res = { sendStatus: jest.fn() };
+            const next = jest.fn();
+
+            await authorizeAuthorOrAdmin(req as any, res as any, next);
+
+            expect(next).toHaveBeenCalled();
+        });
+        
+        it('should return 404 if question does not exist', async () => {
+            const req = { user: { role: 'Student' }, params: { id: '999' } };
+            const res = { sendStatus: jest.fn() };
+            const next = jest.fn();
+
+            jest.spyOn(prisma.question, 'findUnique').mockResolvedValue(null);
+
+            await authorizeAuthorOrAdmin(req as any, res as any, next);
+
+            expect(res.sendStatus).toHaveBeenCalledWith(404);
+            expect(next).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('authorizeQuestionCreation', () => {
+        it('should allow user to create question with their ID', () => {
+            const req = {
+                user: { id: '1' },
+                body: { studentId: '1' }
+            };
+            const res = { sendStatus: jest.fn() };
+            const next = jest.fn();
+
+            authorizeQuestionCreation(req as any, res as any, next);
+
+            expect(next).toHaveBeenCalled();
+        });
+
+        it('should allow user to create question with professor ID', () => {
+            const req = {
+                user: { id: '1' },
+                body: { professorId: '1' }
+            };
+            const res = { sendStatus: jest.fn() };
+            const next = jest.fn();
+
+            authorizeQuestionCreation(req as any, res as any, next);
+
+            expect(next).toHaveBeenCalled();
+        });
+
+        it('should return 403 if user ID does not match', () => {
+            const req = {
+                user: { id: '1' },
+                body: { studentId: '2' }
+            };
+            const res = { sendStatus: jest.fn() };
+            const next = jest.fn();
+
+            authorizeQuestionCreation(req as any, res as any, next);
+
+            expect(res.sendStatus).toHaveBeenCalledWith(403);
+            expect(next).not.toHaveBeenCalled();
+        });
+
+        it('should return 403 if neither studentId nor professorId match', () => {
+            const req = {
+                user: { id: '1' },
+                body: {}
+            };
+            const res = { sendStatus: jest.fn() };
+            const next = jest.fn();
+
+            authorizeQuestionCreation(req as any, res as any, next);
+
+            expect(res.sendStatus).toHaveBeenCalledWith(403);
+            expect(next).not.toHaveBeenCalled();
+        });
     });
 });
