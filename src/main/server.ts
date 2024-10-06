@@ -3,10 +3,14 @@ import { questionRoutes } from './routes/questionRoutes';
 import { disciplineRoutes } from './routes/disciplineRoutes';
 import { userRoutes } from './routes/userRoutes';
 import { admRoutes } from './routes/admRoutes';
+import cors from 'cors';
 import loginRouter from './routes/loginRoutes';
 
 const app = express();
 const port = 3000;
+
+app.use(cors());
+
 app.use(express.json());
 app.use(loginRouter);
 app.use(questionRoutes);
