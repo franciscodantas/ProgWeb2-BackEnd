@@ -47,7 +47,7 @@ export class AuthService {
                 return new Error('Credenciais inválidas');
             }
 
-            const token = this.generateToken(user.id, userType);
+            const token = this.generateToken(user.id, userType, user.name);
             return { token };
         } catch (error) {
             console.error('Error during login:', error);
@@ -55,8 +55,8 @@ export class AuthService {
         }
     }
 
-    private generateToken(userId: number, role: string) {
-        return jwt.sign({ id: userId, role }, JWT_SECRET, {
+    private generateToken(userId: number, role: string, name: string) {
+        return jwt.sign({ id: userId, role, name }, JWT_SECRET, {
             expiresIn: '1h',
         });
     }

@@ -46,4 +46,14 @@ export class AuthController {
             return response.status(500).json({ error: 'Erro interno no servidor.' });
         }
     }
+
+    async getProfile(request: Request, response: Response) {
+        try {
+            console.log(request.user);
+            const user = request.user;
+            return response.status(200).json({ profile: user });
+        } catch (error) {
+            return response.status(500).json({ error: 'Erro interno no servidor.' });
+        }
+    }
 }
