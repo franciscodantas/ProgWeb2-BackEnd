@@ -49,7 +49,6 @@ export class AuthController {
 
     async getProfile(request: Request, response: Response) {
         try {
-            console.log(request.user);
             const user = request.user;
             return response.status(200).json({ profile: user });
         } catch (error) {
